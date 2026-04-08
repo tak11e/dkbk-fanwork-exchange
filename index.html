@@ -16,84 +16,78 @@
 </ol>
 
 <script>
-window.addEventListener('load', () => {
+    let allTags = [];
+    let pinnedTags = new Set();
+
     const searchInput = document.getElementById('tagSearch');
     const listElement = document.getElementById('list_for_freeform_0');
     const pinnedList = document.getElementById('pinnedList');
     const pinnedSection = document.getElementById('pinnedSection');
 
-    let allTags = [];
-    let pinnedTags = new Set();
-
-    // DEBUG: Let's see if the script even finds your HTML elements
-    if (!searchInput || !listElement) {
-        alert("HTML elements missing! Check your IDs.");
-        return;
+    function togglePin(tag) {
+        if (pinnedTags.has(tag)) {
+            pinnedTags.delete(tag);
+        } else {
+            pinnedTags.add(tag);
+        }
+        updatePinnedUI();
+        renderTags(searchInput.value);
     }
 
-    fetch('tags.json')
-        .then(response => response.json())
-        .then(data => {
-            // Check if data is an array or an object with a tags property
-            allTags = Array.isArray(data) ? data : data.tags;
+    function updatePinnedUI() {
+        if (pinnedTags.size > 0) {
+            pinnedSection.style.display = 'block';
+            pinnedList.innerHTML = Array.from(pinnedTags).map(tag =>
+                `<span style="background:#fff; border:1px solid #999; padding:2px 5px; border-radius:3px;">${tag}</span>`
+            ).join(' ');
+        } else {
+            pinnedSection.style.display = 'none';
+        }
+    }
 
-            if (!allTags || allTags.length === 0) {
-                listElement.innerHTML = "<li>The tags.json file is empty.</li>";
-                return;
-            }
+    function renderTags(str = '') {
+        const filtered = allTags.filter(t => t.toLowerCase().includes(str.toLowerCase()));
 
-            const render = (str = '') => {
-                const filtered = allTags.filter(t => t.toLowerCase().includes(str.toLowerCase()));
-
-                listElement.innerHTML = filtered.map(tag => {
-                    const isChecked = pinnedTags.has(tag) ? 'checked' : '';
-                    return `
-                        <li>
-                            <input type="checkbox" ${isChecked} onchange= "togglePin('${tag.replace(/'/g, "\\'")}')">
-                            ${tag}
-                        </li>`;
+        listElement.innerHTML = filtered.map(tag => {
+            const isChecked = pinnedTags.has(tag) ? 'checked' : '';
+            return `
+                <li>
+                    <input type="checkbox" ${isChecked} onchange= "togglePin('${tag.replace(/'/g, "\\'")}')" style="display:inline-block; vertical-align: middle;">
+                    <span style="vertical-align: middle;">${tag}</span>
+                    </li>`;
                 }).join('');
-            };
+    }
 
-            //handle pinning
-            window.togglePin = (tag) => {
-                if (pinnedTags.has(tag)) {
-                    pinnedTags.delete(tag);
-                } else {
-                    pinnedTags.add(tag);
-                }
-                updatePinnedUI();
-                render(searchInput.value)
-            };
+    //copy to clipboard
+    window.copyPinned = () => {
+        const text = Array.from(pinnedTags).join(', ');
+        navigator.clipboard.writeText(text);
+        alert("Pinned tags copied to clipboard!")
+    };
 
-            function updatePinnedUI() {
-                if (pinnedTags.size > 0) {
-                    pinnedSection.style.display = 'block';
-                    pinnedList.innerHTML = Array.from(pinnedTags).map(tag =>
-                        `<span style="background:#fff; border:1px solid #999; padding:2px 5px; border-radius:3px;">${tag}</span>`
-                    ).join(' ');
-                } else {
-                    pinnedSection.style.display = 'none';
-                }
-            }
 
-            //copy to clipboard
-            window.copyPinned = () => {
-                const text = Array.from(pinnedTags).join(', ');
-                navigator.clipboard.writeText(text);
-                alert("Pinned tags copied to clipboard!")
-            };
+    window.addEventListener('load', () => {
+        // DEBUG: Let's see if the script even finds your HTML elements
+        if (!searchInput || !listElement) {
+            alert("HTML elements missing! Check your IDs.");
+            return;
+        }
 
-            // Initial render
-            render();
+        fetch('tags.json')
+            .then(response => response.json())
+            .then(data => {
+                // Check if data is an array or an object with a tags property
+                allTags = Array.isArray(data) ? data : data.tags;
+                renderTags();
 
-            // Search listener
-            searchInput.addEventListener('input', (e) => render(e.target.value));
-        })
-        .catch(err => {
-            listElement.innerHTML = "<li>Could not load tags.json. Check file location.</li>";
-        });
-});
+                searchInput.addEventListener('input', (e) => {
+                    renderTags(e.target.value);
+                });
+            })
+            .catch(err => {
+                listElement.innerHTML = "<li>Error: tags not found</li>"
+            })
+    });
 </script>
 
 
