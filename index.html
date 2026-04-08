@@ -8,6 +8,7 @@
     <strong>Pinned tags:</strong>
     <button onclick="copyPinned()">Copy All Pinned</button>
     <ul id="pinnedList" style="list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;"></ul>
+    <button onclick="clearPinned()">Clear All Pinned</button>
  </div>
 
 <!-- The List -->
@@ -79,7 +80,7 @@
 
     window.addEventListener('load', () => {
         loadFromStorage();
-        
+
         // DEBUG: Let's see if the script even finds your HTML elements
         if (!searchInput || !listElement) {
             alert("HTML elements missing! Check your IDs.");
