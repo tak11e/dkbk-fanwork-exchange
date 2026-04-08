@@ -34,7 +34,8 @@
         }
     }
 
-    function togglePin(tag) {
+    function togglePinByIndex(index) {
+        const tag = allTags[index]
         if (pinnedTags.has(tag)) {
             pinnedTags.delete(tag);
         } else {
@@ -59,19 +60,19 @@
     }
 
     function renderTags(str = '') {
-        const filtered = allTags.filter(t => t.toLowerCase().includes(str.toLowerCase()));
+        let html = "";
 
-        listElement.innerHTML = filtered.map(tag => {
-            const isChecked = pinnedTags.has(tag) ? 'checked' : '';
-
-            const safeTag = encodeURIComponent(tag);
-
-            return `
-                <li>
-                    <input type="checkbox" ${isChecked} onchange= "togglePin(decodeURIComponent('${safeTag}'))" style="display:inline-block; vertical-align: middle;">
-                    <span style="vertical-align: middle;">${tag}</span>
+        allTags.forEach((tag, index) => {
+            if (tag.toLowerCase().includes(str.toLowerCase())) {
+                const isChecked = pinnedTags.has(tag) ? 'checked' : '';
+                html += `
+                    <li>
+                        <input type="checkbox" ${isChecked} onchange="togglePinByIndex(${index})" style="display:inline-block; vertical-align: middle;">
+                        <span style="vertical-align: middle;">${tag}</span>
                     </li>`;
-                }).join('');
+            }
+        });
+        listElement.innerHTML = html;
     }
 
     //copy to clipboard
@@ -93,8 +94,6 @@
     };
 
     window.addEventListener('load', () => {
-        loadFromStorage();
-
         // DEBUG: Let's see if the script even finds your HTML elements
         if (!searchInput || !listElement) {
             alert("HTML elements missing! Check your IDs.");
@@ -104,8 +103,8 @@
         fetch('tags.json')
             .then(response => response.json())
             .then(data => {
-                // Check if data is an array or an object with a tags property
                 allTags = Array.isArray(data) ? data : data.tags;
+                loadFromStorage();
                 renderTags();
 
                 searchInput.addEventListener('input', (e) => {
