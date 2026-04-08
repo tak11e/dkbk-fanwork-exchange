@@ -3,6 +3,13 @@
 <!-- The Search Bar -->
 <input type="text" id="tagSearch" placeholder="Search tags..." style="width: 100%; padding: 10px; margin-bottom: 10px;">
 
+<!-- Pinned Section -->
+ <div id="pinnedSection" style="display:none; background: #f0f0f0; padding: 10px; border: 1px solid #ccc; margin: 10px 0;">
+    <strong>Pinned tags:</strong>
+    <button onclick="copyPinned()">Copy All Pinned</button>
+    <ul id="pinnedList" style="list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;"></ul>
+ </div>
+
 <!-- The List -->
 <ol id="list_for_freeform_0" class="tags index group">
   <!-- Tags will be injected here -->
@@ -12,6 +19,11 @@
 window.addEventListener('load', () => {
     const searchInput = document.getElementById('tagSearch');
     const listElement = document.getElementById('list_for_freeform_0');
+    const pinnedList = document.getElementById('pinnedList');
+    const pinnedSection = document.getElementById('pinnedSection');
+
+    let allTags = [];
+    let pinnedTags = new Set();
 
     // DEBUG: Let's see if the script even finds your HTML elements
     if (!searchInput || !listElement) {
@@ -23,19 +35,53 @@ window.addEventListener('load', () => {
         .then(response => response.json())
         .then(data => {
             // Check if data is an array or an object with a tags property
-            const tags = Array.isArray(data) ? data : data.tags;
+            allTags = Array.isArray(data) ? data : data.tags;
 
-            if (!tags || tags.length === 0) {
+            if (!allTags || allTags.length === 0) {
                 listElement.innerHTML = "<li>The tags.json file is empty.</li>";
                 return;
             }
 
             const render = (str = '') => {
-                const html = tags
-                    .filter(t => t.toLowerCase().includes(str.toLowerCase()))
-                    .map(t => `<li>${t}</li>`)
-                    .join('');
-                listElement.innerHTML = html;
+                const filtered = allTags.filter(t => t.toLowerCase().includes(str.toLowerCase()));
+
+                listElement.innerHTML = filtered.map(tag => {
+                    const isChecked = pinnedTags.has(tag) ? 'checked' : '';
+                    return `
+                        <li>
+                            <input type="checkbox" ${isChecked} onchange= "togglePin('${tag.replace(/'/g, "\\'")}')">
+                            ${tag}
+                        </li>`;
+                }).join('');
+            };
+
+            //handle pinning
+            window.togglePin = (tag) => {
+                if (pinnedTags.has(tag)) {
+                    pinnedTags.delete(tag);
+                } else {
+                    pinnedTags.add(tag);
+                }
+                updatePinnedUI();
+                render(searchInput.value)
+            };
+
+            function updatePinnedUI() {
+                if (pinnedTags.size > 0) {
+                    pinnedSection.style.display = 'block';
+                    pinnedList.innerHTML = Array.from(pinnedTags).map(tag =>
+                        `<span style="background:#fff; border:1px solid #999; padding:2px 5px; border-radius:3px;">${tag}</span>`
+                    ).join(' ');
+                } else {
+                    pinnedSection.style.display = 'none';
+                }
+            }
+
+            //copy to clipboard
+            window.copyPinned = () => {
+                const text = Array.from(pinnedTags).join(', ');
+                navigator.clipboard.writeText(text);
+                alert("Pinned tags copied to clipboard!")
             };
 
             // Initial render
