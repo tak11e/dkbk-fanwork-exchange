@@ -1,20 +1,21 @@
 <head></head>
 <body>
-<!-- The Search Bar -->
+<!-- The Search Bar & Pinned Buttons -->
 <input type="text" id="tagSearch" placeholder="Search tags..." style="width: 100%; padding: 10px; margin-bottom: 10px;">
 
-<!-- Pinned Section -->
- <div id="pinnedSection" style="display:none; background: #f0f0f0; padding: 10px; border: 1px solid #ccc; margin: 10px 0;">
-    <strong>Pinned tags:</strong>
-    <button onclick="copyPinned()">Copy All Pinned</button>
+<div style="margin-bottom: 10px;">
+    <button onclick="copyPinned()">Copy All</button>
     <button onclick="clearPinned()" style="background: #ffcccc; border: 1px solid #999; margin-left: 10px; cursor: pointer;">Clear All</button>
+</div>"
+
+<!-- Pinned Section -->
+<div id="pinnedSection" style="display:none; background: #f0f0f0; padding: 10px; border: 1px solid #ccc; margin: 10px 0;">
+    <strong>Current Selection:</strong>
     <ul id="pinnedList" style="list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;"></ul>
- </div>
+</div>
 
 <!-- The List -->
-<ol id="list_for_freeform_0" class="tags index group">
-  <!-- Tags will be injected here -->
-</ol>
+<ol id="list_for_freeform_0" class="tags index group"></ol>
 
 <script>
     let allTags = [];
@@ -72,6 +73,7 @@
 
     //copy to clipboard
     window.copyPinned = () => {
+        if (pinnedTags.size === 0) return alert("Nothing pinned to copy!");
         const text = Array.from(pinnedTags).join(', ');
         navigator.clipboard.writeText(text);
         alert("Pinned tags copied to clipboard!")
@@ -81,11 +83,8 @@
     window.clearPinned = () => {
         if (confirm("Unpin all selected tags?")) {
             pinnedTags.clear();
-
             localStorage.removeItem('myPinnedTags');
-
             updatePinnedUI();
-
             renderTags(searchInput.value);
         }
     };
