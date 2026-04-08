@@ -7,8 +7,8 @@
  <div id="pinnedSection" style="display:none; background: #f0f0f0; padding: 10px; border: 1px solid #ccc; margin: 10px 0;">
     <strong>Pinned tags:</strong>
     <button onclick="copyPinned()">Copy All Pinned</button>
+    <button onclick="clearPinned()" style="background: #ffcccc; border: 1px solid #999; margin-left: 10px; cursor: pointer;">Clear All</button>
     <ul id="pinnedList" style="list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;"></ul>
-    <button onclick="clearPinned()">Clear All Pinned</button>
  </div>
 
 <!-- The List -->
@@ -77,6 +77,18 @@
         alert("Pinned tags copied to clipboard!")
     };
 
+    //clear pinned
+    window.clearPinned = () => {
+        if (confirm("Unpin all selected tags?")) {
+            pinnedTags.clear();
+
+            localStorage.removeItem('myPinnedTags');
+
+            updatePinnedUI();
+
+            renderTags(searchInput.value);
+        }
+    };
 
     window.addEventListener('load', () => {
         loadFromStorage();
