@@ -24,12 +24,23 @@
     const pinnedList = document.getElementById('pinnedList');
     const pinnedSection = document.getElementById('pinnedSection');
 
+    function loadFromStorage() {
+        const saved = localStorage.getItem('myPinnedTags');
+        if (saved) {
+            pinnedTags = new Set(JSON.parse(saved));
+            updatePinnedUI();
+        }
+    }
+
     function togglePin(tag) {
         if (pinnedTags.has(tag)) {
             pinnedTags.delete(tag);
         } else {
             pinnedTags.add(tag);
         }
+
+        localStorage.setItem('myPinnedTags', JSON.stringify(Array.from(pinnedTags)));
+
         updatePinnedUI();
         renderTags(searchInput.value);
     }
@@ -67,6 +78,8 @@
 
 
     window.addEventListener('load', () => {
+        loadFromStorage();
+        
         // DEBUG: Let's see if the script even finds your HTML elements
         if (!searchInput || !listElement) {
             alert("HTML elements missing! Check your IDs.");
