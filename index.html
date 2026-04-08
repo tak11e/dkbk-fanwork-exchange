@@ -63,9 +63,12 @@
 
         listElement.innerHTML = filtered.map(tag => {
             const isChecked = pinnedTags.has(tag) ? 'checked' : '';
+
+            const safeTag = encodeURIComponent(tag);
+
             return `
                 <li>
-                    <input type="checkbox" ${isChecked} onchange= "togglePin('${tag.replace(/'/g, "\\'")}')" style="display:inline-block; vertical-align: middle;">
+                    <input type="checkbox" ${isChecked} onchange= "togglePin(decodeURIComponent('${safeTag}'))" style="display:inline-block; vertical-align: middle;">
                     <span style="vertical-align: middle;">${tag}</span>
                     </li>`;
                 }).join('');
