@@ -1,0 +1,54 @@
+<head></head>
+<body>
+<!-- The Search Bar -->
+<input type="text" id="tagSearch" placeholder="Search tags..." style="width: 100%; padding: 10px; margin-bottom: 10px;">
+
+<!-- The List -->
+<ol id="list_for_freeform_0" class="tags index group">
+  <!-- Tags will be injected here -->
+</ol>
+
+<script>
+window.addEventListener('load', () => {
+    const searchInput = document.getElementById('tagSearch');
+    const listElement = document.getElementById('list_for_freeform_0');
+
+    // DEBUG: Let's see if the script even finds your HTML elements
+    if (!searchInput || !listElement) {
+        alert("HTML elements missing! Check your IDs.");
+        return;
+    }
+
+    fetch('tags.json')
+        .then(response => response.json())
+        .then(data => {
+            // Check if data is an array or an object with a tags property
+            const tags = Array.isArray(data) ? data : data.tags;
+
+            if (!tags || tags.length === 0) {
+                listElement.innerHTML = "<li>The tags.json file is empty.</li>";
+                return;
+            }
+
+            const render = (str = '') => {
+                const html = tags
+                    .filter(t => t.toLowerCase().includes(str.toLowerCase()))
+                    .map(t => `<li>${t}</li>`)
+                    .join('');
+                listElement.innerHTML = html;
+            };
+
+            // Initial render
+            render();
+
+            // Search listener
+            searchInput.addEventListener('input', (e) => render(e.target.value));
+        })
+        .catch(err => {
+            listElement.innerHTML = "<li>Could not load tags.json. Check file location.</li>";
+        });
+});
+</script>
+
+
+</body>
