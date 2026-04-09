@@ -128,7 +128,7 @@
     }
 
     function togglePinByIndex(index) {
-        const tag = allTags[index]
+        const tag = tagData.all[index]
         if (pinnedTags.has(tag)) {
             pinnedTags.delete(tag);
         } else {
