@@ -185,6 +185,7 @@
     //copy to clipboard
     window.copyPinned = () => {
         if (pinnedTags.size === 0) return alert("Nothing pinned to copy!");
+        if (pinnedTags.size > 20) return alert("Too many tags! The DKBK Fanwork Exchange Collection has a limit of up to 20 tags.")
         const text = Array.from(pinnedTags).join(', ');
         navigator.clipboard.writeText(text);
         alert("Pinned tags copied to clipboard!")
