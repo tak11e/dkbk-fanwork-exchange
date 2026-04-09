@@ -24,7 +24,6 @@
 <div style="margin-bottom: 10px;">
     <button onclick="copyPinned()">Copy All</button>
     <button onclick="clearPinned()" style="background: #ffcccc; border: 1px solid #999; margin-left: 10px; cursor: pointer;">Clear All</button>
-    <button onclick="filterNSFW()" style ="background: #ff4444; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">Show NSFW</button>
 </div>
 
 <!-- Pinned Section -->
@@ -40,7 +39,7 @@
     let allTags = [];
     let pinnedTags = new Set();
 
-    const SECRET_KEY = "T2FzaXNWaW9saW41Mjc=";
+    const SECRET_KEY = "4f6173697356696f6c696e353237";
 
     const searchInput = document.getElementById('tagSearch');
     const listElement = document.getElementById('list_for_freeform_0');
@@ -59,8 +58,17 @@
     }
 
     function checkModPass() {
-        if (btoa(modPassField) == SECRET_KEY) {
+        const toHex = (str) => {
+            let hex = "";
+            for (let i = 0; i < str.length; i++) {
+                hex += str.charCodeAt(i).toString(16);
+            }
+            return hex;
+        }
+
+        if (toHex(modPassField) == SECRET_KEY) {
             alert("Debug mode activated.");
+            document.body.classList.add('admin-mod');
             closeModModal();
         } else {
             alert("Incorrect key.")
