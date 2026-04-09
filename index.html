@@ -1,3 +1,23 @@
+<style>
+    body.admin-mode {
+        border: 5px solid red;
+        box-sizing: border-box;
+        min-height: 100vh;
+    }
+
+    #adminTools {
+        display: none;
+        background: #ffebeb;
+        padding: 15px;
+        border: 1px dashed red;
+        margin: 10px 0;
+    }
+
+    body.admin-mode #adminTools {
+        display: block;
+    }
+</style>
+
 <head></head>
 <body>
 <!-- Admin Trigger -->
@@ -17,6 +37,13 @@
     </div>
  </div>
 
+ <!-- Admin Tools Section -->
+  <div id="adminTools">
+    <strong>Admin Debug</strong>
+    <button onclick="assignFliterToPinned()" style="background: darkred; color: white; cursor: pointer;">
+        Filter Tags
+    </button>
+  </div>
 
 <!-- The Search Bar & Pinned Buttons -->
 <input type="text" id="tagSearch" placeholder="Search tags..." style="width: 100%; padding: 10px; margin-bottom: 10px;">
@@ -32,12 +59,27 @@
     <ul id="pinnedList" style="list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;"></ul>
 </div>
 
+<!-- Filters -->
+ <div class="public-filters" style="margin: 20px 0;">
+    <strong>Filter By:</strong>
+    <button onclick="setGroup('all')">All</button>
+    <button onclick="setGroup('nsfw')">NSFW</button>
+    <button onclick="setGroup('sfw')">SFW</button>
+    <button onclick="setGroup('dddne')">DDDNE</button>
+    <button onclick="setGroup('angst')">Angst</button>
+    <button onclick="setGroup('silly')">Silly</button>
+    <button onclick="setGroup('au')">AUs</button>
+ </div>"
+
 <!-- The List -->
 <ol id="list_for_freeform_0" class="tags index group"></ol>
 
 <script>
     let allTags = [];
     let pinnedTags = new Set();
+
+    let tagData = { all: [], nsfw: [], sfw: [], au: [], angst: [], dddne: [], silly: []};
+    let currentGroup = 'all' // default view
 
     const SECRET_KEY = "4f6173697356696f6c696e353237";
 
@@ -111,19 +153,33 @@
     }
 
     function renderTags(str = '') {
+        const activeTags = tagData[currentGroup] || [];
+        const filtered = activeTags.filter(tag => 
+            tag.toLowerCase().includes(str.toLowerCase())
+        );
+
         let html = "";
 
-        allTags.forEach((tag, index) => {
+        filtered.forEach((tag) => {
             if (tag.toLowerCase().includes(str.toLowerCase())) {
                 const isChecked = pinnedTags.has(tag) ? 'checked' : '';
+
+                const globalIndex = tagData.all.indexOf(tag)
+
                 html += `
                     <li>
-                        <input type="checkbox" ${isChecked} onchange="togglePinByIndex(${index})" style="display:inline-block; vertical-align: middle;">
+                        <input type="checkbox" ${isChecked} onchange="togglePinByIndex(${globalIndex})" style="display:inline-block; vertical-align: middle;">
                         <span style="vertical-align: middle;">${tag}</span>
                     </li>`;
             }
         });
         listElement.innerHTML = html;
+    }
+
+    //filter
+    window.setGroup = (groupName) => {
+        currentGroup = groupName;
+        renderTags(searchInput.value)
     }
 
     //copy to clipboard
@@ -144,20 +200,7 @@
         }
     };
 
-    window.filterNSFW = () => {
-        const filter = document.getElementById('groupFilter');
-
-        Array.from(filter.options).forEach(opt => opt.selected = false);
-
-        const nsfwOpt = Array.from(filter.options).find(opt => opt.value === 'nsfw');
-        if (nsfwOpt) {
-            nsfwOpt.selected = true;
-        }
-
-        searchInput.value = '';
-
-        renderTags('');
-    }
+    //admin filtering
 
     window.addEventListener('load', () => {
         // DEBUG: Let's see if the script even finds your HTML elements
@@ -169,7 +212,7 @@
         fetch('tags.json')
             .then(response => response.json())
             .then(data => {
-                allTags = Array.isArray(data) ? data : data.tags;
+                tagData = data;
                 loadFromStorage();
                 renderTags();
 
