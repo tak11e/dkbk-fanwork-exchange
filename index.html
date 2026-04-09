@@ -58,17 +58,19 @@
     }
 
     function checkModPass() {
-        const toHex = (str) => {
-            let hex = "";
-            for (let i = 0; i < str.length; i++) {
-                hex += str.charCodeAt(i).toString(16);
-            }
-            return hex;
-        }
+        const input = modPassField.value;
 
-        if (toHex(modPassField) == SECRET_KEY) {
+        const toHex = (str) => {
+            return Array.from(new TextEncoder().encode(str))
+                .map(b => b.toString(16).padStart(2, '0'))
+                .join('');
+        };
+
+        const inputHex = toHex(input);
+
+        if (inputHex == SECRET_KEY) {
             alert("Debug mode activated.");
-            document.body.classList.add('admin-mod');
+            document.body.classList.add('admin-mode');
             closeModModal();
         } else {
             alert("Incorrect key.")
