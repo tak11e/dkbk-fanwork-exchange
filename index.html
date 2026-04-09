@@ -6,6 +6,7 @@
 <div style="margin-bottom: 10px;">
     <button onclick="copyPinned()">Copy All</button>
     <button onclick="clearPinned()" style="background: #ffcccc; border: 1px solid #999; margin-left: 10px; cursor: pointer;">Clear All</button>
+    <button onclick="filterNSFW()" style = "#ff4444; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">Show NSFW</button>
 </div>
 
 <!-- Pinned Section -->
@@ -92,6 +93,21 @@
             renderTags(searchInput.value);
         }
     };
+
+    window.filterNSFW = () => {
+        const filter = document.getElementById('groupFilter');
+
+        Array.from(filter.options).forEach(opt => opt.selected = false);
+
+        const nsfwOpt = Array.from(filter.options).find(opt => opt.value === 'nsfw');
+        if (nsfwOpt) {
+            nsfwOpt.selected = true;
+        }
+
+        searchInput.value = '';
+
+        renderTags('');
+    }
 
     window.addEventListener('load', () => {
         // DEBUG: Let's see if the script even finds your HTML elements
