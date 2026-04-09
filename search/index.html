@@ -126,9 +126,10 @@
             updatePinnedUI();
         }
     }
-
+    //add tag to pinned
     function togglePinByIndex(index) {
         const tag = tagData.all[index]
+        if (pinnedTags.size > 20) return alert("Too many tags! The DKBK Fanwork Exchange Collection has a limit of up to 20 tags.")
         if (pinnedTags.has(tag)) {
             pinnedTags.delete(tag);
         } else {
