@@ -132,7 +132,6 @@
         if (pinnedTags.has(tag)) {
             pinnedTags.delete(tag);
         } else {
-            if (pinnedTags.size > 20) return alert("Too many tags! The DKBK Fanwork Exchange Collection has a limit of up to 20 tags.")
             pinnedTags.add(tag);
         }
 
@@ -144,6 +143,7 @@
 
     function updatePinnedUI() {
         if (pinnedTags.size > 0) {
+            if (pinnedTags.size > 20) return alert("Too many tags! The DKBK Fanwork Exchange Collection has a limit of up to 20 tags.")
             pinnedSection.style.display = 'block';
             pinnedList.innerHTML = Array.from(pinnedTags).map(tag =>
                 `<span style="background:#fff; border:1px solid #999; padding:2px 5px; border-radius:3px;">${tag}</span>`
