@@ -28,9 +28,19 @@ def get_tags():
                 all_tags.extend(tags)
             
             unique_tags = list(dict.fromkeys(all_tags))
+
+            organized = {
+                "all": all_tags,
+                "nsfw": [],
+                "sfw": [],
+                "au": [],
+                "angst": [],
+                "dddne": [],
+                "silly": []
+            }
             
             with open('tags.json', 'w') as f:
-                json.dump(unique_tags, f, indent=4)
+                json.dump(organized, f, indent=4)
             
             print(f"Success! Found {len(freeform_lists)} separate lists.")
             print(f"Total unique tags saved: {len(unique_tags)}")
