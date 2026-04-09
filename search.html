@@ -1,0 +1,231 @@
+<style>
+    body.admin-mode {
+        border: 5px solid red;
+        box-sizing: border-box;
+        min-height: 100vh;
+    }
+
+    #adminTools {
+        display: none;
+        background: #ffebeb;
+        padding: 15px;
+        border: 1px dashed red;
+        margin: 10px 0;
+    }
+
+    body.admin-mode #adminTools {
+        display: block;
+    }
+</style>
+
+<head></head>
+<body>
+<!-- Admin Trigger -->
+<div style="position: absolute; top: 10px; right: 10px; z-index: 1000;">
+    <a href="javascript:void(0)" onclick="openModModal()" style="font-size: 12px; color: #888; text-decoration: none;">Are you a moderator?</a>
+</div>
+
+<!-- Pop-up Container -->
+ <div id="modModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
+    <div style="background: white; padding: 20px; border-radius: 8px; text-align: center; width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+        <h3>Moderator Access</h3>
+        <p>Please enter the debug key:</p>
+        <input type="password" id="modPassField" style="width: 80%; padding: 8px; margin-bottom: 10px;">
+        <br>
+        <button onclick="checkModPass()">Login</button>
+        <button onclick="closeModModal()" style="background: #ccc; border: none; cursor: pointer;">Cancel</button>
+    </div>
+ </div>
+
+ <!-- Admin Tools Section -->
+  <div id="adminTools">
+    <strong>Admin Debug</strong>
+    <button onclick="assignFliterToPinned()" style="background: darkred; color: white; cursor: pointer;">
+        Filter Tags
+    </button>
+  </div>
+
+<!-- The Search Bar & Pinned Buttons -->
+<input type="text" id="tagSearch" placeholder="Search tags..." style="width: 100%; padding: 10px; margin-bottom: 10px;">
+
+<div style="margin-bottom: 10px;">
+    <button onclick="copyPinned()">Copy All</button>
+    <button onclick="clearPinned()" style="background: #ffcccc; border: 1px solid #999; margin-left: 10px; cursor: pointer;">Clear All</button>
+</div>
+
+<!-- Pinned Section -->
+<div id="pinnedSection" style="display:none; background: #f0f0f0; padding: 10px; border: 1px solid #ccc; margin: 10px 0;">
+    <strong>Current Selection:</strong>
+    <ul id="pinnedList" style="list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;"></ul>
+</div>
+
+<!-- Filters -->
+ <div class="public-filters" style="margin: 20px 0;">
+    <strong>Filter By:</strong>
+    <button onclick="setGroup('all')">All</button>
+    <button onclick="setGroup('nsfw')">NSFW</button>
+    <button onclick="setGroup('sfw')">SFW</button>
+    <button onclick="setGroup('dddne')">DDDNE</button>
+    <button onclick="setGroup('angst')">Angst</button>
+    <button onclick="setGroup('silly')">Silly</button>
+    <button onclick="setGroup('au')">AUs</button>
+ </div>
+
+<!-- The List -->
+<ol id="list_for_freeform_0" class="tags index group"></ol>
+
+<script>
+    let allTags = [];
+    let pinnedTags = new Set();
+
+    let tagData = { all: [], nsfw: [], sfw: [], au: [], angst: [], dddne: [], silly: []};
+    let currentGroup = 'all' // default view
+
+    const SECRET_KEY = "4f6173697356696f6c696e353237";
+
+    const searchInput = document.getElementById('tagSearch');
+    const listElement = document.getElementById('list_for_freeform_0');
+    const pinnedList = document.getElementById('pinnedList');
+    const pinnedSection = document.getElementById('pinnedSection');
+    const modModal = document.getElementById('modModal')
+    const modPassField = document.getElementById('modPassField')
+
+    function openModModal() {
+        modModal.style.display = 'flex';
+    }
+
+    function closeModModal() {
+        modModal.style.display = 'none';
+        modPassField.value = '';
+    }
+
+    function checkModPass() {
+        const input = modPassField.value;
+
+        const toHex = (str) => {
+            return Array.from(new TextEncoder().encode(str))
+                .map(b => b.toString(16).padStart(2, '0'))
+                .join('');
+        };
+
+        const inputHex = toHex(input);
+
+        if (inputHex == SECRET_KEY) {
+            alert("Debug mode activated.");
+            document.body.classList.add('admin-mode');
+            closeModModal();
+        } else {
+            alert("Incorrect key.")
+        }
+    }
+
+    function loadFromStorage() {
+        const saved = localStorage.getItem('myPinnedTags');
+        if (saved) {
+            pinnedTags = new Set(JSON.parse(saved));
+            updatePinnedUI();
+        }
+    }
+
+    function togglePinByIndex(index) {
+        const tag = tagData.all[index]
+        if (pinnedTags.has(tag)) {
+            pinnedTags.delete(tag);
+        } else {
+            pinnedTags.add(tag);
+        }
+
+        localStorage.setItem('myPinnedTags', JSON.stringify(Array.from(pinnedTags)));
+
+        updatePinnedUI();
+        renderTags(searchInput.value);
+    }
+
+    function updatePinnedUI() {
+        if (pinnedTags.size > 0) {
+            pinnedSection.style.display = 'block';
+            pinnedList.innerHTML = Array.from(pinnedTags).map(tag =>
+                `<span style="background:#fff; border:1px solid #999; padding:2px 5px; border-radius:3px;">${tag}</span>`
+            ).join(' ');
+        } else {
+            pinnedSection.style.display = 'none';
+        }
+    }
+
+    function renderTags(str = '') {
+        const activeTags = tagData[currentGroup] || [];
+        const filtered = activeTags.filter(tag => 
+            tag.toLowerCase().includes(str.toLowerCase())
+        );
+
+        let html = "";
+
+        filtered.forEach((tag) => {
+            if (tag.toLowerCase().includes(str.toLowerCase())) {
+                const isChecked = pinnedTags.has(tag) ? 'checked' : '';
+
+                const globalIndex = tagData.all.indexOf(tag)
+
+                html += `
+                    <li>
+                        <input type="checkbox" ${isChecked} onchange="togglePinByIndex(${globalIndex})" style="display:inline-block; vertical-align: middle;">
+                        <span style="vertical-align: middle;">${tag}</span>
+                    </li>`;
+            }
+        });
+        listElement.innerHTML = html;
+    }
+
+    //filter
+    window.setGroup = (groupName) => {
+        currentGroup = groupName;
+        renderTags(searchInput.value)
+    }
+
+    //copy to clipboard
+    window.copyPinned = () => {
+        if (pinnedTags.size === 0) return alert("Nothing pinned to copy!");
+        if (pinnedTags.size > 20) return alert("Too many tags! The DKBK Fanwork Exchange Collection has a limit of up to 20 tags.")
+        const text = Array.from(pinnedTags).join(', ');
+        navigator.clipboard.writeText(text);
+        alert("Pinned tags copied to clipboard!")
+    };
+
+    //clear pinned
+    window.clearPinned = () => {
+        if (confirm("Unpin all selected tags?")) {
+            pinnedTags.clear();
+            localStorage.removeItem('myPinnedTags');
+            updatePinnedUI();
+            renderTags(searchInput.value);
+        }
+    };
+
+    //admin filtering
+
+    window.addEventListener('load', () => {
+        // DEBUG: Let's see if the script even finds your HTML elements
+        if (!searchInput || !listElement) {
+            alert("HTML elements missing! Check your IDs.");
+            return;
+        }
+
+        fetch('tags.json')
+            .then(response => response.json())
+            .then(data => {
+                tagData = data;
+                loadFromStorage();
+                renderTags();
+
+                searchInput.addEventListener('input', (e) => {
+                    renderTags(e.target.value);
+                });
+            })
+            .catch(err => {
+                listElement.innerHTML = "<li>Error: tags not found</li>"
+            })
+    });
+</script>
+
+
+</body>
