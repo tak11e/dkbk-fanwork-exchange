@@ -119,13 +119,6 @@
     }
 
   /* Navigation buttons */
-    .carousel-overlay {
-        margin-top: auto;
-        width: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
     .nav-btn {
         position: absolute;
         top: 50%;
@@ -165,15 +158,13 @@
 <body>
 
 <div class="carousel-container">
-    <div class="carousel-track" id="track">
-    
-        <div class="carousel-item">Loading works...</div>
-        <div class="carousel-overlay">
-            <button class="nav-btn prev" onclick="move(-1)">&#10094;</button>
-            <button class="nav-btn next" onclick="move(1)">&#10095;</button>
-        </div>
-    </div>
-    <div class="progress-bar" id="dotsContainer"></div>
+  <div class="carousel-track" id="track">
+    <div class="carousel-item">Loading works...</div>
+  </div>
+  <button class="nav-btn prev" onclick="move(-1)">&#10094;</button>
+  <button class="nav-btn next" onclick="move(1)">&#10095;</button>
+
+  <div class="progress-bar" id="dotsContainer"></div>
 </div>
 
 <script>
