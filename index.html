@@ -3,3 +3,61 @@
         <a href="https://tak11e.github.io/dkbk-fanwork-exchange/search/">Search Tags</a>
     </nav>
 </header>
+<body>
+    <div id="dailyCarousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner" id="carousel-content">
+            <!-- JS will inject slides here-->
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#dailyCarousel" data-bs-ride="prev">
+            <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#dailyCarousel" data-bs-ride="next">
+            <span class="carousel-control-next-icon"></span>
+        </button>
+    </div>
+    <script>
+        async function loadDailyHighlights() {
+            const response = await fetch('collection_works.json');
+            const data = await response.json();
+
+            const seed = new Date().toISOString().split('t')[0];
+
+            const picks = [
+                ...getRandomPicks(data.sfw.fics, 2, seed + "sf"),
+                ...getRandomPicks(data.nsfw.fics, 2, seed + "nf"),
+                ...getRandomPicks(data.sfw.art, 2, seed + "sa"),
+                ...getRandomPicks(data.nsfw.art, 2, seed + "na")
+            ];
+
+            const container = document.getElementById('carousel-content');
+            picks.foreach((work, index) => {
+                const activeClass = index == 0 ? 'active' : '';
+                container.innerHTML += `
+                <div class="carousel-item ${activeClass}">
+                    <div class="d-block w-100 p-5 text-center bg-dark text-light border">
+                        <h3>${work.title}</h3>
+                        <p>${work.summary.substring(0, 150)}...</p>
+                        <a href="${work.url}" target="_blank" class="btn btn-primary">View on AO3</a href>
+                    </div>
+                </div>`;
+            });
+        }
+
+        function getRandomPicks(list, count, seed) {
+            if (list.length <= count) return list
+
+            let shuffled = [...list].sort(() => {
+                let hash = 0;
+                for (let i = 0; i < seed.length; i++) {
+                    hash = ((hash << 5) - hash) + seed.charCodeAt(i);
+                    hash |= 0;
+                }
+                return Math.sin(hash) - 0.5
+            });
+
+            return shuffled.slice(0, count);
+        }
+
+        loadDailyHighlights();
+    </script>
+</body>
