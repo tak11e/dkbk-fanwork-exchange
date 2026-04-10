@@ -68,7 +68,30 @@
     }
 
     /* Art Specific */
-    .art-preview {
+    .art-content-wrapper {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        flex-grow: 1;
+        overflow: hidden;
+        align-items: flex-start;
+    }
+    .art-content-wrapper .art-preview {
+        width: 55%;
+        height: 300px;
+        object-fit: cover;
+        margin-bottom: 0;
+        object-position: center;
+        border-radius: 8px;
+    }
+    .side-tags {
+        width: 45%;
+        justify-content: flex-start !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        text-align: left;
+    }
+    /* .art-preview {
         width: 60%;
         height: 60%; 
         object-fit: cover;
@@ -76,7 +99,7 @@
         border-radius: 8px; 
         margin-bottom: 15px; 
         flex-shrink: 0; 
-    }
+    } */
 
     /* Fic Specific */
     .item-summary { 
@@ -88,7 +111,7 @@
         max-height: 60%;
         overflow-y: auto;
     }
-    .tag-container { 
+    .carousel-item:not(:has(.art-content-wrapper)) .tag-container { 
         display: flex; 
         flex-wrap: wrap; 
         gap: 5px 4px; 
@@ -210,20 +233,23 @@
                 const isArt = work.type == 'art';
                 const ratingClass = work.rating == 'nsfw' ? 'badge-nsfw' : 'badge-sfw';
 
-                // If fic
-                const tagsHtml = !isArt && work.tags ? `
-                <div class="tag-container">
+                // Common tags html
+                const tagsHtml = work.tags ? `
+                <div class="tag-container ${isArt ? 'side-tags' : ''}">
                     ${work.tags.map(t => `<span class="tag">${t}</span>`).join('')}
                 </div>
                 ` : '';
 
                 // If art
                 const middleContent = isArt ? `
-                <img src="${work.image}" class="art-preview" alt="${work.title}" onerror="this.src='https://placeholder.com'">
-                <div class="tag-container">
-                    ${work.tags.map(t => `<span class="tag">${t}</span>`).join('')}
-                </div>
-                ` : `<div class="item-summary">${work.summary}</div>${tagsHtml}`;
+                    <div class="art-content-wrapper">
+                        <img src="${work.image}" class="art-preview" alt="${work.title}" onerror="this.src='https://placeholder.com'">
+                        ${tagsHtml}
+                    </div>
+                ` : `
+                    <div class="item-summary">${work.summary}</div>
+                    ${tagsHtml}
+                `;
 
                 return `
                     <div class="carousel-item">
