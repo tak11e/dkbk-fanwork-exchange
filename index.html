@@ -1,5 +1,93 @@
-<header>
+<!-- <head>
     <nav>
         <a href="https://tak11e.github.io/dkbk-fanwork-exchange/search/">Search Tags</a>
     </nav>
-</header>
+</head> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<style>
+  /* 1. Main container to clip the sliding content */
+  .carousel-container {
+    position: relative;
+    width: 300px;
+    margin: 40px auto;
+    overflow: hidden;
+    border: 3px solid #333;
+    border-radius: 12px;
+    background: #fff;
+  }
+
+  /* 2. Track that holds all items in a single row */
+  .carousel-track {
+    display: flex;
+    transition: transform 0.4s ease-in-out;
+  }
+
+  /* 3. Individual carousel items */
+  .carousel-item {
+    min-width: 100%;
+    height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5rem;
+    font-family: sans-serif;
+    color: #555;
+    background: #f9f9f9;
+  }
+
+  /* 4. Navigation buttons */
+  .nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.6);
+    color: white;
+    border: none;
+    padding: 12px 16px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    border-radius: 50%;
+    z-index: 10;
+  }
+  .nav-btn:hover { background: #000; }
+  .prev { left: 10px; }
+  .next { right: 10px; }
+</style>
+</head>
+<body>
+
+<div class="carousel-container">
+  <div class="carousel-track" id="track">
+    <div class="carousel-item">1</div>
+    <div class="carousel-item">2</div>
+    <div class="carousel-item">3</div>
+    <div class="carousel-item">4</div>
+    <div class="carousel-item">5</div>
+    <div class="carousel-item">6</div>
+    <div class="carousel-item">7</div>
+    <div class="carousel-item">8</div>
+  </div>
+
+  <button class="nav-btn prev" onclick="move(-1)">&#10094;</button>
+  <button class="nav-btn next" onclick="move(1)">&#10095;</button>
+</div>
+
+<script>
+  let currentIndex = 0;
+  const track = document.getElementById('track');
+  const items = document.querySelectorAll('.carousel-item');
+  const totalItems = items.length;
+
+  function move(direction) {
+    // Logic to loop back to start or end
+    currentIndex = (currentIndex + direction + totalItems) % totalItems;
+    // Shift the track by 100% of the container width per item
+    track.style.transform = `translateX(${-currentIndex * 100}%)`;
+  }
+</script>
+
+</body>
+</html>
