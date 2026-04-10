@@ -137,11 +137,17 @@
         font-size: 0.65rem; 
         background: #f1f5f9; 
         color: #475569; 
-        padding: 1px 6px; 
+        padding: 2px 6px; 
         border-radius: 4px; 
         border: 1px solid #e2e8f0;
-        white-space: nowrap;
         height: fit-content;
+
+        /* Wrapping logic for long tags */
+        white-space: normal;
+        word-break: break-word;
+        text-align: left;
+        display: inline-block;
+        max-width: 100%;
     }
 
     .view-link { 
