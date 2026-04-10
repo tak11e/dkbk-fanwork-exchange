@@ -27,6 +27,7 @@
         display: flex;
         flex-grow: 1;
         transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        height: 100%;
     }
 
     /* Individual carousel items */
@@ -49,9 +50,12 @@
         border-radius: 20px; 
         text-transform: uppercase; 
         margin-bottom: 8px; 
+        flex-shrink: 0;
     }
+
     .badge-nsfw { background: #fee2e2; color: #4f0e00; }
     .badge-sfw { background: #f0fdf4; color: #2a332c; }
+
     .item-title { 
         position: relative; 
         z-index: 5; 
@@ -59,14 +63,15 @@
         color: #111; 
         font-size: 1.2rem; 
         height: 2.8em; 
-        overflow: hidden; 
+        overflow: hidden;
+        flex-shrink: 0;
     }
 
     /* Art Specific */
     .art-preview {
-        width: 100%; 
-        height: 60%; 
-        max-height: 400px;
+        width: auto;
+        max-width: 100%;
+        height: 280px; 
         object-fit: cover;
         border-radius: 8px; 
         margin-bottom: 15px; 
@@ -80,6 +85,7 @@
         line-height: 1.4; 
         margin-bottom: 10px; 
         flex-shrink: 0;
+        max-height: 4.2em;
         overflow-y: auto;
     }
     .tag-container { 
@@ -91,6 +97,8 @@
         padding: 5px; 
         flex-grow: 1;
         width: 100%;
+        margin-bottom: 15px;
+        align-content: flex-start;
     }
     .tag { 
         font-size: 0.65rem; 
@@ -98,7 +106,8 @@
         color: #475569; 
         padding: 2px 6px; 
         border-radius: 4px; 
-        border: 1px solid #e2e8f0; 
+        border: 1px solid #e2e8f0;
+        height: fit-content;
     }
 
     .view-link { 
@@ -109,8 +118,8 @@
         border-radius: 5px; 
         font-size: 0.85rem; 
         font-weight: 600; 
-        display: flex; 
-        justify-content: center; 
+        margin-top: auto;
+        flex-shrink: 0; 
     }
 
   /* Navigation buttons */
@@ -139,6 +148,7 @@
         padding: 15px 0; 
         background: #f8fafc; 
         border-top: 1px solid #eee; 
+        flex-shrink: 0;
     }
     .dot { 
         width: 8px; 
