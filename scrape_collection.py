@@ -62,7 +62,8 @@ def scrape_all_pages(total_pages=13):
                         "url": work_url,
                         "summary": summary_box.get_text(strip=True) if summary_box else "No summary provided.",
                         "tags": [t.get_text(strip=True) for t in tag_elements],
-                        "image": img_url if img_url else "No image provided."
+                        "image": img_url if img_url else "No image provided.",
+                        "last_featured": ""
                     }
 
                     rating_icon = blurb.select_one('.rating')

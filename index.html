@@ -175,12 +175,21 @@
             const response = await fetch('collection_works.json');
             const data = await response.json();
 
+            // Helper to sort by date (oldest first) and grab top 2
+            const getLeastRecent = (rating, type) => {
+                const list = data[rating]?.[type] || [];
+                return list
+                    .sort((a, b) => new Date(a.last_featured || 0) - new Date(b.last_featured || 0))
+                    .slice(0, 2)
+                    .map(w => ({ ...w, rating, type }))
+            }
+
             // Create labeled arrays to help distinguish Type and Rating later
             works = [
-                ...((data.nsfw?.fics || []).slice(0, 2).map(w => ({ ...w, rating: 'nsfw', type: 'fic' }))),
-                ...((data.sfw?.fics || []).slice(0, 2).map(w => ({ ...w, rating: 'sfw', type: 'fic' }))),
-                ...((data.nsfw?.art || []).slice(0, 2).map(w => ({ ...w, rating: 'nsfw', type: 'art' }))),
-                ...((data.sfw?.art || []).slice(0, 2).map(w => ({ ...w, rating: 'sfw', type: 'art' })))
+                ...getLeastRecent('nsfw', 'fics'),
+                ...getLeastRecent('sfw', 'fics'),
+                ...getLeastRecent('nsfw', 'art'),
+                ...getLeastRecent('sfw', 'art')
             ];
 
             // Build HTML for each item
@@ -198,6 +207,9 @@
                 // If art
                 const middleContent = isArt ? `
                 <img src="${work.image}" class="art-preview" alt="${work.title}" onerror="this.src='https://placeholder.com'">
+                <div class="tag-container">
+                    ${work.tags.map(t => `<span class="tag">${t}</span>`).join('')}
+                </div>
                 ` : `<div class="item-summary">${work.summary}</div>${tagsHtml}`;
 
                 return `
