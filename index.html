@@ -104,8 +104,8 @@
     /* Hidden State */
     .spoiler-container {
         position: relative;
-        width: 55%;
-        height: 60%;
+        width: 100%;
+        height: 100%;
         cursor: pointer;
         overflow: hidden;
         border-radius: 8px;
@@ -283,7 +283,8 @@
             // Build HTML for each item
             track.innerHTML = works.map(work => {
                 const isArt = work.type == 'art';
-                const ratingClass = work.rating == 'nsfw' ? 'badge-nsfw' : 'badge-sfw';
+                const isNSFW = work.rating == 'nsfw';
+                const ratingClass = isNSFW ? 'badge-nsfw' : 'badge-sfw';
 
                 // Common tags html
                 const tagsHtml = work.tags ? `
@@ -295,13 +296,16 @@
                 // If art
                 const middleContent = isArt ? `
                     <div class="art-content-wrapper">
-                        <div class="spoiler-container" ${work.rating == 'nsfw' ? '' : 'revealed'}" onclick="this.classList.toggle('revealed')">
-                            <img src="${work.image}" class="art-preview" alt="${work.title}" onerror="this.src='https://placeholder.com'">
-                            ${work.rating == 'nsfw' ? `
+                        ${isNSFW ? `
+                            <div class="spoiler-container" onclick="this.classList.toggle('revealed')">}
+                                <img src="${work.image}" class="art-preview" alt="${work.title}" onerror="this.src='https://placeholder.com'">
                                 <div class="spoiler-overlay">
                                     <span class="spoiler-text">SPOILER</span>
-                                </div>` : ''}
-                        </div>
+                                </div>
+                            </div>
+                        ` : `
+                            <img src="${work.image}" class="art-preview" onerror="this.src='https://placeholder.com'">
+                        `}
                         ${tagsHtml}
                     </div>
                 ` : `
