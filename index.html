@@ -304,7 +304,10 @@
                         </div>
                         ${tagsHtml}
                     </div>
-                ` : `...`;
+                ` : `
+                    <div class="item-summary">${work.summary}</div>
+                    ${tagsHtml}
+                `;
 
                 return `
                     <div class="carousel-item">
