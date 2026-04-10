@@ -69,74 +69,34 @@
 
     /* Art Specific */
     .art-content-wrapper {
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        gap: 15px;
+        margin-bottom: 15px;
+        overflow: hidden;
+        box-sizing: border-box;
         position: relative;
         width: 100%;
         height: 60%;
-    }/* display: flex;
-        flex-direction: row;
-        gap: 15px;
-        box-sizing: border-box;
-        flex-shrink: 0;
-        overflow: hidden;
-        align-items: stretch;
-        margin-bottom: 15px; */
-    .spoiler-container {
+    }
+    .spoiler-container,
+    .art-preview-wrapper {
+        flex: 1;
         position: relative;
         cursor: pointer;
         overflow: hidden;
-        flex: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
         border-radius: 8px;
+        height: 100%;
     }
-
-    .spoiler-container .art-preview,
     .art-preview {
         width: 100%;
         height: 100%;
-        object-fit: cover;
-        object-position: center;
-        transition: filter 0.3s ease;
+        object-fit: cover;         
+        object-position: center;   
+        display: block;
+        transition: filter 0.3s ease, transform 0.3s ease;
     }
-
-    /* Blur effect */
-    .spoiler-container:not(.revealed) .art-preview {
-        filter: blur(40px) scale(1.1); 
-    }
-
-    .spoiler-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.6);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 2;
-        transition: opacity 0.2s ease;
-    }
-    .spoiler-text {
-        color: #fff;
-        background: rgba(0, 0, 0, 0.8);
-        padding: 6px 15px;
-        border-radius: 8px;
-        font-size: 12px;
-        font-weight: bold;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-    }
-
-    .spoiler-container.revealed .spoiler-overlay {
-        opacity: 0;
-        pointer-events: none;
-    }
-    .spoiler-container.revealed .art-preview {
-        filter: blur(0) scale(1);
-    }
-        
     .side-tags {
         width: 45%;
         display: flex;
@@ -147,58 +107,32 @@
         align-content: flex-start;
         overflow-y: auto;
         height: 100%;
-        padding: 0 5px 0 0 !important;
+        /* padding: 0 5px 0 0 !important; */
     }
 
-
-    /* Hidden State */
-    /* .art-preview, 
-    .spoiler-container {
-        position: relative;
-        width: 55% !important;
-        height: 100% !important;
-        overflow: hidden;
-        border-radius: 8px;
-        flex-shrink: 0;
-    }
-    .art-preview img,
-    .spoiler-container img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        object-position: center;
-        display: block;
-    }
-    .spoiler-container img {
+    /* Spoiler overlay */
+    .spoiler-container:not(.revealed) .art-preview {
         filter: blur(40px);
-        transition: filter 0.3s ease;
+        transform: scale(1.1);
     }
     .spoiler-overlay {
         position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: rgba(0, 0, 0, 0.7);
-        padding: 6px 16px;
-        border-radius: 8px;
-        z-index: 10;
-        pointer-events: none;
-    }
-    .spoiler-text {
-        color: white;
-        font-weight: bold;
-        font-size: 0.8rem;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-    }
-
-    /* Revealed State */
-    /* .spoiler-container.revealed img {
-        filter: blur(0);
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2;
+        transition: opacity 0.2s ease;
     }
     .spoiler-container.revealed .spoiler-overlay {
         opacity: 0;
-    } */ 
+        pointer-events: none;
+    }
+    .spoiler-container.revealed .art-preview {
+        filter: blur(0);
+        transform: scale(1);
+    }
 
     /* Fic Specific */
     .item-summary { 
@@ -360,7 +294,9 @@
                                 </div>
                             </div>
                         ` : `
-                            <img src="${work.image}" class="art-preview" onerror="this.src='https://placeholder.com'">
+                            <div class="art-preview-wrapper">
+                                <img src="${work.image}" class="art-preview" onerror="this.src='https://placeholder.com'">
+                            </div>
                         `}
                         ${tagsHtml}
                     </div>
