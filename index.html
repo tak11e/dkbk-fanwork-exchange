@@ -100,15 +100,53 @@
         height: 100%;
         padding: 0 !important;
     }
-    /* .art-preview {
-        width: 60%;
-        height: 60%; 
+
+    /* Hidden State */
+    .spoiler-container {
+        position: relative;
+        width: 55%;
+        height: 300px;
+        cursor: pointer;
+        overflow: hidden;
+        border-radius: 8px;
+    }
+    .spoiler-container img {
+        width: 100%;
+        height: 100%;
         object-fit: cover;
-        object-position: center;
-        border-radius: 8px; 
-        margin-bottom: 15px; 
-        flex-shrink: 0; 
-    } */
+        filter: blur(40px);
+        transition: filter 0.3s ease;
+    }
+    .spoiler-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.4);
+        display: flex;
+        justify-content: center;
+        z-index: 2;
+        transition: opacity 0.3s ease;;
+    }
+    .spoiler-text {
+        color: white;
+        font-weight: bold;
+        font-size: 0.8rem;
+        background: rgba(0, 0, 0, 0.6);
+        padding: 8px 16px;
+        border-radius: 20px;
+        letter-spacing: 1px;
+    }
+
+    /* Revealed State */
+    .spoiler-container.revealed img {
+        filter: blur(0);
+    }
+    .spoiler-container.revealed .spoiler-overlay {
+        opacity: 0;
+        pointer-events: none;
+    }
 
     /* Fic Specific */
     .item-summary { 
@@ -118,7 +156,7 @@
         margin: 0 auto 20px auto;
         flex-shrink: 0;
         width: 85%;
-        max-height: 60%;
+        max-height: 40%;
         overflow-y: auto;
         text-align: center;
     }
@@ -260,7 +298,12 @@
                 // If art
                 const middleContent = isArt ? `
                     <div class="art-content-wrapper">
-                        <img src="${work.image}" class="art-preview" alt="${work.title}" onerror="this.src='https://placeholder.com'">
+                        <div class="spoiler-container" onclick="this.classList.toggle('revealed')">
+                            <img src="${work.image}" class="art-preview" alt="${work.title}" onerror="this.src='https://placeholder.com'">
+                            <div class="spoiler-overlay">
+                                <span class="spoiler-text">CLICK TO REVEAL</span>
+                            </div>
+                        </div>
                         ${tagsHtml}
                     </div>
                 ` : `
