@@ -237,10 +237,10 @@
 
             // Create labeled arrays to help distinguish Type and Rating later
             works = [
-                ...getLeastRecent('nsfw', 'fics'),
-                ...getLeastRecent('sfw', 'fics'),
-                ...getLeastRecent('nsfw', 'art'),
-                ...getLeastRecent('sfw', 'art')
+                ...getLeastRecent('sfw', 'fic'),
+                ...getLeastRecent('sfw', 'art'),
+                ...getLeastRecent('nsfw', 'fic'),
+                ...getLeastRecent('nsfw', 'art')
             ];
 
             // Build HTML for each item

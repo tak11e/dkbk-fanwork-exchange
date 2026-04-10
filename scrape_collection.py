@@ -12,8 +12,8 @@ def scrape_all_pages(total_pages=13):
     scraper.cookies.set("view_adult", "true", domain="archiveofourown.org")
     
     organized = {
-        "nsfw": {"art": [], "fics": []},
-        "sfw": {"art": [], "fics": []}
+        "nsfw": {"art": [], "fic": []},
+        "sfw": {"art": [], "fic": []}
     }
 
     for page_num in range(1, total_pages + 1):
@@ -75,7 +75,7 @@ def scrape_all_pages(total_pages=13):
                     is_art_tag = bool(re.search(r'\b(art|fanart)\b', tags_as_string))
                     is_art = is_art_tag or (img_url != "" and word_count < 100)
                     
-                    type_key = "art" if is_art else "fics"
+                    type_key = "art" if is_art else "fic"
 
                     organized[rating_key][type_key].append(work_data)
                     found_on_page += 1
@@ -91,7 +91,7 @@ def scrape_all_pages(total_pages=13):
         
     with open('collection_works.json', 'w') as f:
         json.dump(organized, f, indent=4)
-    print(f"Saved {len(organized['nsfw']['art'] + organized['sfw']['art'] + organized['nsfw']['fics'] + organized['sfw']['fics'])} works across {total_pages} pages.")
+    print(f"Saved {len(organized['nsfw']['art'] + organized['sfw']['art'] + organized['nsfw']['fic'] + organized['sfw']['fic'])} works across {total_pages} pages.")
 
 if __name__ == "__main__":
     scrape_all_pages(13)
