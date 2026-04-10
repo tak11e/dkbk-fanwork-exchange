@@ -183,8 +183,9 @@
         /* Wrapping logic for long tags */
         white-space: normal;
         word-break: break-word;
-        text-align: center;
-        display: inline-block;
+        overflow-wrap: break-word;
+        text-align: left;
+        display: inline-flex;
         max-width: 100%;
     }
 
@@ -298,7 +299,7 @@
                 const middleContent = isArt ? `
                     <div class="art-content-wrapper">
                         ${isNSFW ? `
-                            <div class="spoiler-container" onclick="this.classList.toggle('revealed')">}
+                            <div class="spoiler-container" onclick="this.classList.toggle('revealed')">
                                 <img src="${work.image}" class="art-preview" alt="${work.title}" onerror="this.src='https://placeholder.com'">
                                 <div class="spoiler-overlay">
                                     <span class="spoiler-text">SPOILER</span>
