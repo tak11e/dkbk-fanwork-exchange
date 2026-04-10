@@ -72,24 +72,33 @@
         display: flex;
         flex-direction: row;
         width: 100%;
+        height: 300px;
+        gap: 15px;
+        box-sizing: border-box;
         flex-grow: 1;
         overflow: hidden;
         align-items: flex-start;
     }
     .art-content-wrapper .art-preview {
         width: 55%;
-        height: 300px;
+        height: 100%;
         object-fit: cover;
         margin-bottom: 0;
         object-position: center;
         border-radius: 8px;
+        flex-shrink: 0;
     }
     .side-tags {
         width: 45%;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 4px;
         justify-content: flex-start !important;
+        align-content: flex-start;
+        overflow-y: auto;
+        height: 100%;
         padding: 0 !important;
-        margin: 0 !important;
-        text-align: left;
     }
     /* .art-preview {
         width: 60%;
