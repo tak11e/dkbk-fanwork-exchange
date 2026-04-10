@@ -8,37 +8,83 @@
 <html lang="en">
 <head>
 <style>
-  /* 1. Main container to clip the sliding content */
+  /* Main container to clip the sliding content */
   .carousel-container {
     position: relative;
-    width: 300px;
-    margin: 40px auto;
+    width: 400px;
+    margin: 2rem auto;
     overflow: hidden;
     border: 3px solid #333;
-    border-radius: 12px;
+    border-radius: 8px;
     background: #fff;
   }
 
-  /* 2. Track that holds all items in a single row */
+  /* Track that holds all items in a single row */
   .carousel-track {
     display: flex;
-    transition: transform 0.4s ease-in-out;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  /* 3. Individual carousel items */
-  .carousel-item {
-    min-width: 100%;
-    height: 250px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 5rem;
-    font-family: sans-serif;
-    color: #555;
-    background: #f9f9f9;
-  }
+  /* Individual carousel items */
+  .carousel-item { 
+    min-width: 100%; 
+    box-sizing: border-box; 
+    padding: 20px; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    text-align: center; 
+    height: 350px; justify-content: center;
+    }
+  .item-badge { 
+    font-size: 0.7rem; 
+    font-weight: bold; 
+    padding: 2px 8px; 
+    border-radius: 4px; 
+    text-transform: uppercase;
+    margin-bottom: 8px; 
+    }
+  .badge-nsfw { 
+    background: #fee2e2; 
+    color: #991b1b; 
+    }
+  .badge-sfw { 
+    background: #f0fdf4; 
+    color: #166534; 
+    }
+  
+  .item-title { 
+    margin: 10px 0; 
+    font-family: sans-serif; 
+    color: #111; 
+    font-size: 1.25rem; 
+    }
+  .item-summary { 
+    font-size: 0.9rem; 
+    color: #444; 
+    line-height: 1.4; 
+    display: -webkit-box;
+    -webkit-line-clamp: 4; 
+    -webkit-box-orient: vertical; 
+    overflow: hidden; 
+    margin-bottom: 15px; 
+    height: 5.6em; 
+    }
+  .view-link { 
+    display: inline-block; 
+    padding: 8px 16px; 
+    background: #2563eb; 
+    color: #fff; 
+    text-decoration: none; 
+    border-radius: 5px; 
+    font-size: 0.85rem; 
+    font-weight: 600; 
+    }
+  .view-link:hover { 
+    background: #1d4ed8; 
+    }
 
-  /* 4. Navigation buttons */
+  /* Navigation buttons */
   .nav-btn {
     position: absolute;
     top: 50%;
@@ -61,32 +107,58 @@
 
 <div class="carousel-container">
   <div class="carousel-track" id="track">
-    <div class="carousel-item">1</div>
-    <div class="carousel-item">2</div>
-    <div class="carousel-item">3</div>
-    <div class="carousel-item">4</div>
-    <div class="carousel-item">5</div>
-    <div class="carousel-item">6</div>
-    <div class="carousel-item">7</div>
-    <div class="carousel-item">8</div>
+    <div class="carousel-item">Loading works...</div>
   </div>
-
   <button class="nav-btn prev" onclick="move(-1)">&#10094;</button>
   <button class="nav-btn next" onclick="move(1)">&#10095;</button>
 </div>
 
 <script>
-  let currentIndex = 0;
-  const track = document.getElementById('track');
-  const items = document.querySelectorAll('.carousel-item');
-  const totalItems = items.length;
+    let currentIndex = 0;
+    const track = document.getElementById('track');
 
-  function move(direction) {
-    // Logic to loop back to start or end
-    currentIndex = (currentIndex + direction + totalItems) % totalItems;
-    // Shift the track by 100% of the container width per item
-    track.style.transform = `translateX(${-currentIndex * 100}%)`;
-  }
+    async function initCarousel() {
+        try {
+            const response = await fetch('collection_works.json');
+            const data = await response.json();
+
+            // Safely grab 2 items from each category
+            const getSet = (rating, type) => (data[rating] && data[rating][type]) ? data[rating][type].slice(0, 2) : [];
+            
+            const works = [
+                ...getSet('nsfw', 'fics'), ...getSet('sfw', 'fics'),
+                ...getSet('nsfw', 'art'), ...getSet('sfw', 'art')
+            ];
+
+            // Build HTML for each item
+            track.innerHTML = works.map((work, index) => {
+                const ratingClass = work.url.includes('nsfw') || works.indexOf(work) < 2 || (works.indexOf(work) >= 4 && works.indexOf(work) < 6) ? 'badge-nsfw' : 'badge-sfw';
+                const ratingText = ratingClass === 'badge-nsfw' ? 'NSFW' : 'SFW';
+                
+                return `
+                <div class="carousel-item">
+                    <span class="item-badge ${ratingClass}">${ratingText}</span>
+                    <h3 class="item-title">${work.title}</h3>
+                    <div class="item-summary">${work.summary || 'No summary provided.'}</div>
+                    <a href="${work.url}" class="view-link" target="_blank">Read/View Work</a>
+                </div>
+                `;
+            }).join('');
+
+        } catch (err) {
+            console.error("Fetch error:", err);
+            track.innerHTML = '<div class="carousel-item">Failed to load local data.</div>';
+        }
+    }
+
+    function move(dir) {
+        const slides = document.querySelectorAll('.carousel-item');
+        if (!slides.length) return;
+        currentIndex = (currentIndex + dir + slides.length) % slides.length;
+        track.style.transform = `translateX(-${currentIndex * 100}%)`;
+    }
+
+    initCarousel();
 </script>
 
 </body>

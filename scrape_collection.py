@@ -7,7 +7,7 @@ import re
 
 OLD_COLLECTION_URL = "https://archive.transformativeworks.org/collections/dkbk_exchange/works"
 
-def scrape_all_pages(total_pages=1):
+def scrape_all_pages(total_pages=13):
     scraper = cloudscraper.create_scraper(browser={'browser': 'chrome', 'platform': 'windows'})
     scraper.cookies.set("view_adult", "true", domain="archiveofourown.org")
     
@@ -93,4 +93,4 @@ def scrape_all_pages(total_pages=1):
     print(f"Saved {len(organized['nsfw']['art'] + organized['sfw']['art'] + organized['nsfw']['fics'] + organized['sfw']['fics'])} works across {total_pages} pages.")
 
 if __name__ == "__main__":
-    scrape_all_pages(1)
+    scrape_all_pages(13)
