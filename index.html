@@ -258,19 +258,17 @@
         margin: 0.643em;
     } */
     .item-summary blockquote p {
-        line-height: 1.5;
-        white-space: pre-wrap;
-        word-wrap: break-word;
-        border: 0;
-        margin: 0.643em;
-    }
-    .item-summary .userstuff p:has(br) {
-        line-height: 1.5;
-        white-space: pre-wrap;
+        line-height: 1.5 !important;
+        white-space: pre-line !important;
         word-wrap: break-word;
         border: 0;
         margin: 0.643em;
         display: block;
+    }
+    .item-summary blockquote p br {
+        display: block;
+        content: "";
+        margin-top: 0.5em;
     }
     .userstuff blockquote {
         line-height: 1.5;
