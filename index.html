@@ -248,21 +248,15 @@
         overflow-y: auto;
         text-align: left;
     }
-    /* blockquote spacing */
-    /* .item-summary blockquote {
-        line-height: 1.5;
-        white-space: pre-wrap;
-        word-wrap: break-word;
-        border: 0;
-        margin: 0.643em;
-    } */
     .item-summary blockquote {
+        display: block !important;
+    }
+    .item-summary blockquote p {
         line-height: 1.5 !important;
-        white-space: pre-line !important;
-        word-wrap: break-word;
-        border: 0;
-        margin: 0.643em !important;
-        display: block;
+        white-space: pre-wrap !important;
+        margin: 0 !important;
+        padding-bottom: 1.2em !important; 
+        display: block !important;
     }
     .userstuff blockquote {
         line-height: 1.5;
@@ -429,6 +423,9 @@
                 const isNSFW = work.rating == 'nsfw';
                 const ratingClass = isNSFW ? 'badge-nsfw' : 'badge-sfw';
 
+                // replace <br> with </p><p>
+                const formattedSummary = work.summary.replace(/<br\s*\/?>/gi, '</p><p>');
+
                 // Common tags html
                 const tagsHtml = work.tags ? `
                 <div class="tag-container ${isArt ? 'side-tags' : ''}">
@@ -455,7 +452,7 @@
                     </div>
                 ` : `
                     <div class="item-summary">
-                        <blockquote class="userstuff">${work.summary}</blockquote>
+                        <blockquote class="userstuff">${formattedSummary}</blockquote>
                     </div>
                     ${tagsHtml}
                 `;
