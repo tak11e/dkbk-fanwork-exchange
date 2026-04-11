@@ -245,6 +245,9 @@
         overflow-y: auto;
         text-align: left;
     }
+    .userstuff {
+        border-left: 5px solid #ccc
+    }
     .carousel-item:not(:has(.art-content-wrapper)) .tag-container { 
         display: flex; 
         flex-wrap: wrap; 
@@ -429,9 +432,7 @@
                     </div>
                 ` : `
                     <div class="item-summary">
-                        <blockquote>
-                            <p>${work.summary}</p>
-                        </blockquote>
+                        <blockquote class="userstuff">${work.summary}</blockquote>
                     </div>
                     ${tagsHtml}
                 `;

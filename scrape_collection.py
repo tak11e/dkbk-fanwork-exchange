@@ -7,9 +7,32 @@ import re
 
 OLD_COLLECTION_URL = "https://archive.transformativeworks.org/collections/dkbk_exchange/works"
 
-def scrape_all_pages(total_pages=13):
+def get_total_pages(scraper):
+    try:
+        response = scraper.get(OLD_COLLECTION_URL)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.text, 'html.parser')
+
+        pagination = soup.select('ol.pagination li a')
+        if not pagination:
+            return 1
+        
+        page_numbers = []
+        for link in pagination:
+            text = link.get_text(strip=True)
+            if text.isdigit():
+                page_numbers.append(int(text))
+        return max(page_numbers) if page_numbers else 1
+    except Exception as e:
+        print(f"Could not determine total pages: {e}. Defaulting to 1.")
+        return 1
+
+def scrape_all_pages():
     scraper = cloudscraper.create_scraper(browser={'browser': 'chrome', 'platform': 'windows'})
     scraper.cookies.set("view_adult", "true", domain="archiveofourown.org")
+
+    total_pages = get_total_pages(scraper)
+    print(f"Detected {total_pages} pages to scrape.")
     
     organized = {
         "nsfw": {"art": [], "fic": []},
@@ -18,7 +41,7 @@ def scrape_all_pages(total_pages=13):
 
     for page_num in range(1, total_pages + 1):
         url = f"{OLD_COLLECTION_URL}?page={page_num}"
-        print(f"Scraping page {page_num}...")
+        print(f"Scraping page {page_num}... of {total_pages}")
 
         try:
             response = scraper.get(url)
@@ -56,11 +79,15 @@ def scrape_all_pages(total_pages=13):
                         print(f"    ! Cound not load work page: {e}")
                     
                     summary_box = blurb.select_one('blockquote.userstuff')
+                    summary_html = "No summary provided."
+
+                    if summary_box:
+                        summary_html = summary_box.decode_contents().strip()
 
                     work_data = {
                         "title": link.get_text(strip=True),
                         "url": work_url,
-                        "summary": summary_box.get_text(strip=True) if summary_box else "No summary provided.",
+                        "summary": summary_html,
                         "tags": [t.get_text(strip=True) for t in tag_elements],
                         "image": img_url if img_url else "No image provided."
                     }
@@ -93,4 +120,4 @@ def scrape_all_pages(total_pages=13):
     print(f"Saved {len(organized['nsfw']['art'] + organized['sfw']['art'] + organized['nsfw']['fic'] + organized['sfw']['fic'])} works across {total_pages} pages.")
 
 if __name__ == "__main__":
-    scrape_all_pages(13)
+    scrape_all_pages()
