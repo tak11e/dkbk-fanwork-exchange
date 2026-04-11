@@ -371,12 +371,14 @@
             }
 
             // Create labeled arrays to help distinguish Type and Rating later
-            works = [
+            const allWorks = [
                 ...getLeastRecent('sfw', 'fic'),
                 ...getLeastRecent('sfw', 'art'),
                 ...getLeastRecent('nsfw', 'fic'),
                 ...getLeastRecent('nsfw', 'art')
             ];
+
+            works = allWorks.sort(() => 0.5 - Math.random()).slice (0, 8);
 
             // Build HTML for each item
             track.innerHTML = works.map(work => {
