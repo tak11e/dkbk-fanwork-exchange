@@ -356,29 +356,46 @@
     const track = document.getElementById('track');
     const dotsContainer = document.getElementById('dotsContainer');
 
+    function getDailySeed() {
+        return new Date().toISOString().slice(0, 10);
+    }
+
+    // Seeded random function (Mulberry32)
+    function splitmix32(a) {
+        return function() {
+            a |= 0; a = a + 0x9e3779b9 | 0;
+            let t = a ^ a >>> 16; t = Math.imul(t, 0x21f0aaad);
+            t = t ^ t >>> 15; t = Math.imul(t, 0x735a2d97);
+            return ((t = t ^ t >>> 15) >>> 0) / 4294967296;
+        }
+    }
+
     async function initCarousel() {
         try {
             const response = await fetch('collection_works.json');
             const data = await response.json();
+            const seed = getDailySeed();
+            const rnd = splitmix32(hashString(seed));
 
-            // Helper to sort by date (oldest first) and grab top 2
-            const getLeastRecent = (rating, type) => {
-                const list = data[rating]?.[type] || [];
-                return list
-                    .sort((a, b) => new Date(a.last_featured || 0) - new Date(b.last_featured || 0))
-                    .slice(0, 2)
-                    .map(w => ({ ...w, rating, type }))
-            }
+            const getRandomTwo = (rating, type) => {
+                const list = [...(data[rating]?.[type] || [])];
+                const selected = [];
+            
+                // Pick 2 using the seeded random
+                for(let i = 0; i < 2 && list.length > 0; i++) {
+                    const index = Math.floor(rnd() * list.length);
+                    const item = list.splice(index, 1)[0];
+                    selected.push({ ...item, rating, type });
+                }
+                return selected;
+            };
 
-            // Create labeled arrays to help distinguish Type and Rating later
-            const allWorks = [
-                ...getLeastRecent('sfw', 'fic'),
-                ...getLeastRecent('sfw', 'art'),
-                ...getLeastRecent('nsfw', 'fic'),
-                ...getLeastRecent('nsfw', 'art')
+            works = [
+                ...getRandomTwo('sfw', 'fic'),
+                ...getRandomTwo('sfw', 'art'),
+                ...getRandomTwo('nsfw', 'fic'),
+                ...getRandomTwo('nsfw', 'art')
             ];
-
-            works = allWorks.sort(() => 0.5 - Math.random()).slice (0, 8);
 
             // Build HTML for each item
             track.innerHTML = works.map(work => {
@@ -434,6 +451,15 @@
             console.error("Fetch error:", err);
             track.innerHTML = '<div class="carousel-item">Failed to load local data.</div>';
         }
+    }
+
+    function hashString(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            hash = ((hash << 5) - hash) + str.charCodeAt(i);
+            hash |= 0;
+        }
+        return hash;
     }
 
     function updateUI() {
