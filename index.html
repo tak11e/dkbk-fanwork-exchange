@@ -153,6 +153,8 @@
         height: 2.8em; 
         overflow: hidden;
         flex-shrink: 0;
+        font-family: 'Lilita One';
+        font-weight: bold;
     }
 
     /* Art Specific */
@@ -252,7 +254,11 @@
         word-wrap: break-word;
         border: 0;
         margin: 0.643em;
-        /* padding: 0.75em; */
+    }
+    .item-summary blockquote br {
+        display: block;
+        content: "";
+        margin-top: 10px;
     }
     .userstuff blockquote {
         line-height: 1.5;
@@ -260,19 +266,6 @@
         padding: 0.75em;
         border-inline-start: 2px solid #999;
     }
-    /* .userstuff p {
-        margin-top: 1em;
-        margin-bottom: 1em;
-    }
-    .userstuff p:first-child {
-        margin-top: 0;
-    }
-    .userstuff p:last-child {
-        margin-bottom: 0;
-    } */
-
-
-
 
     .carousel-item:not(:has(.art-content-wrapper)) .tag-container { 
         display: flex; 
