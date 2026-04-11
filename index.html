@@ -69,7 +69,17 @@
         animation-play-state: paused;
     }
 
-
+    .countdown {
+        font-family: 'Lilita One';
+        height: 50px;
+        width: 50%;
+        background: #fff;
+        border: 2px solid #f4912e;
+        border-radius: 8px;
+        position: fixed;
+        left: 50%;
+        transform: translateX(-50%);
+    }
 
 
 
@@ -313,15 +323,20 @@
         <p>THIS IS A LONG MESSAGE TO TEST THE DKBK FANWORK EXCHANGE'S SCROLLING ANNOUNCMENT SYSTEM • THIS IS A SHORT MESSAGE • </P>
     </div>
 
-<div class="carousel-container">
-  <div class="carousel-track" id="track">
-    <div class="carousel-item">Loading works...</div>
-  </div>
-  <button class="nav-btn prev" onclick="move(-1)">&#10094;</button>
-  <button class="nav-btn next" onclick="move(1)">&#10095;</button>
+    <!-- Countdown/Calendar -->
+     <div class="countdown">
+        <p>00d 00h 00m 00s</p>
+     </div>
 
-  <div class="progress-bar" id="dotsContainer"></div>
-</div>
+    <div class="carousel-container">
+        <div class="carousel-track" id="track">
+            <div class="carousel-item">Loading works...</div>
+        </div>
+        <button class="nav-btn prev" onclick="move(-1)">&#10094;</button>
+        <button class="nav-btn next" onclick="move(1)">&#10095;</button>
+
+        <div class="progress-bar" id="dotsContainer"></div>
+    </div>
 
 <script>
     let currentIndex = 0;
