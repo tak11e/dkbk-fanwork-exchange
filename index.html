@@ -261,9 +261,13 @@
     .item-summary blockquote p br {
         display: block !important;
         content: "" !important;
-        margin: 0 !important;
-        line-height: 0 !important; 
-        height: 0.8em !important; 
+        margin-top: 1em !important;
+    }
+    .item-summary blockquote p br::after {
+        content: "\00a0"; 
+        display: block;
+        height: 0;
+        visibility: hidden;
     }
 
     .userstuff blockquote {
