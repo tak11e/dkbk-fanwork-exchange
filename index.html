@@ -243,7 +243,7 @@
         width: 85%;
         max-height: 40%;
         overflow-y: auto;
-        text-align: center;
+        /* text-align: center; */
     }
     .carousel-item:not(:has(.art-content-wrapper)) .tag-container { 
         display: flex; 
@@ -429,7 +429,7 @@
                     </div>
                 ` : `
                     <div class="item-summary">
-                        <p><blockquote>${work.summary}</blockquote></p>
+                        <blockquote>${work.summary}</blockquote>
                     </div>
                     ${tagsHtml}
                 `;
