@@ -28,8 +28,9 @@
     
     .scroll-text {
         font-family: 'Libre Franklin';
-        height: 47px;
-        width: 89%;
+        height: 5%;
+        /* height: 47px; */
+        width: 88%;
         overflow: hidden;
         position: relative;
         background: #35826D;
@@ -75,13 +76,12 @@
     .countdown {
         font-family: 'Lilita One';
         font-weight: bold;
-        height: 80px;
+        /* height: 80px; */
+        height: 8%;
         width: 43%;
         background: #f4912e;
         border-radius: 8px;
-        position: fixed;
-        left: 27%;
-        transform: translateX(-50%);
+        left: 6%;
         position: relative;
         top: 32%;
         display: flex;
@@ -89,23 +89,27 @@
         color: #fff;
     }
     .countdown h1 {
-        position: fixed;
+        position: absolute;
         left: 50%;
         transform: translateX(-50%);
         margin: 0;
         word-spacing: 40px;
-        font-size: 70px;
+        /* font-size: 70px; */
+        font-size: 400%;
         text-wrap-mode: nowrap;
+        overflow: hidden;
     }
 
 
 
     .carousel-container {
-        position: fixed;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 875px;
-        height: 525px;
+        position: relative;
+        left: 0%;
+        /* width: 875px; */
+        width: 47%;
+        height: 55%;
+        bottom: -31%;
+        /* height: 525px; */
         margin: 2rem auto;
         overflow: hidden;
         border: 3px solid #f4912e;
@@ -113,7 +117,6 @@
         background: #fff;
         display: flex;
         flex-direction: column;
-        bottom: 0px;
     }
 
     /* Track that holds all items in a single row */
@@ -354,31 +357,30 @@
 </style>
 </head>
 <body>
-    <!-- Scrolling Updates -->
-    <div class="scroll-text">
-        <p>THIS IS A LONG MESSAGE TO TEST THE DKBK FANWORK EXCHANGE'S SCROLLING ANNOUNCMENT SYSTEM • THIS IS A SHORT MESSAGE • </P>
-    </div>
-
-    <!-- Countdown/Calendar -->
-     <div class="countdown">
-        <h1>
-            <span id="days">00</span>d
-            <span id="hours">00</span>h
-            <span id="minutes">00</span>m
-            <span id="seconds">00</span>s
-        </h1>
-     </div>
-
-    <div class="carousel-container">
-        <div class="carousel-track" id="track">
-            <div class="carousel-item">Loading works...</div>
+        <!-- Scrolling Updates -->
+        <div class="scroll-text">
+            <p>THIS IS A LONG MESSAGE TO TEST THE DKBK FANWORK EXCHANGE'S SCROLLING ANNOUNCMENT SYSTEM • THIS IS A SHORT MESSAGE • </P>
         </div>
-        <button class="nav-btn prev" onclick="move(-1)">&#10094;</button>
-        <button class="nav-btn next" onclick="move(1)">&#10095;</button>
 
-        <div class="progress-bar" id="dotsContainer"></div>
-    </div>
+        <!-- Countdown/Calendar -->
+        <div class="countdown">
+            <h1>
+                <span id="days">00</span>d
+                <span id="hours">00</span>h
+                <span id="minutes">00</span>m
+                <span id="seconds">00</span>s
+            </h1>
+        </div>
 
+        <div class="carousel-container">
+            <div class="carousel-track" id="track">
+                <div class="carousel-item">Loading works...</div>
+            </div>
+            <button class="nav-btn prev" onclick="move(-1)">&#10094;</button>
+            <button class="nav-btn next" onclick="move(1)">&#10095;</button>
+
+            <div class="progress-bar" id="dotsContainer"></div>
+        </div>
 <script>
     let currentIndex = 0;
     let works = [];
