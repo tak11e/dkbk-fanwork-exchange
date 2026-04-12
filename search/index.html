@@ -284,11 +284,11 @@ li {
         if (pinnedTags.has(tag)) {
             pinnedTags.delete(tag);
         } else {
-            if (pinnedTags.size >= 20) { 
-                alert("Too many tags! The DKBK Fanwork Exchange Collection has a limit of up to 20 tags.")
-                renderTags(searchInput.value)
-                return
-            }
+            // if (pinnedTags.size >= 20) { 
+            //     alert("Too many tags! The DKBK Fanwork Exchange Collection has a limit of up to 20 tags.")
+            //     renderTags(searchInput.value)
+            //     return
+            // }
             pinnedTags.add(tag);
         }
 
