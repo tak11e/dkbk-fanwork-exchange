@@ -1,22 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <style>
-    /* .filters {
-        display: block;
-        background: #ddd;
-        border: 2px solid #f3efec;
-        margin: 0.643em;
-        padding: 0.643em;
-        box-shadow: inset 1px 0 5px #999;
-        float: right;
-    }
-    .filter {
-        padding: 0 50px;
-        width: 100%;
-        vertical-align: middle;
-        display: inline-block;
-        position: relative;
-    } */
 body {
     background: #111;
     color: #818181;
@@ -29,6 +13,8 @@ label {
     line-height: 25px;
     padding: 8px 12px;
     user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
 }
 li:has(input:checked), label:has(input:checked) {
     background-color: #262626;
@@ -38,6 +24,8 @@ li:has(input:checked), label:has(input:checked) {
 li {
     list-style-position: inside;
     padding: 0 12px;
+    overflow-wrap: normal;
+    overflow-x: hidden;
 }
 #pinnedSection {
     background: #181818;
@@ -71,6 +59,7 @@ li {
     border: 1px solid #0f3128;
     font-family: 'Libre Franklin';
     font-weight: 600;
+    font-size: larger;
 }
 #clearAll { 
     background: #eb8016;
@@ -82,27 +71,38 @@ li {
 }
 
 #tagSearch {
-    width: 100%; 
+    width: 99%; 
     padding: 10px; 
     margin-bottom: 10px;
     background-color: #2c2b2b;
     border-radius: 8px;
-    border-bottom: #000;
+    border: #000;
     font-family: 'Gidole';
     text-transform: uppercase;
+    font-size: large;
+
+    position: sticky;
+    position: -webkit-sticky;
+    top: 0.5%;
+    z-index: 10;
 }
 
 
 .sidenav {
   height: 100%;
   width: 200px;
-  position: fixed;
-  z-index: 1;
   top: 10%;
   right: 0;
   background-color: #111;
   overflow-x: hidden;
   padding-top: 20px;
+  position: fixed;
+  z-index: 1;
+}
+
+#list_for_freeform_0 {
+    margin-right: 200px;
+    font-size: larger;
 }
 
 /* Style the sidenav links and the dropdown button */
@@ -111,28 +111,21 @@ li {
     font-weight: bold;
     padding: 6px 8px 6px 16px;
     text-decoration: none;
-    font-size: 20px;
     color: #818181;
     display: block;
     border: none;
     background: none;
-    width:100%;
+    width: 100%;
     text-align: left;
     cursor: pointer;
     outline: none;
+    font-size: 200%;
 }
 
 /* On mouse-over */
 .sidenav span:hover, .dropdown-btn:hover {
   color: #f1f1f1;
   background-color: #262626;
-}
-
-/* Main content */
-.main {
-  margin-left: 200px; /* Same as the width of the sidenav */
-  font-size: 20px; /* Increased text to enable scrolling */
-  padding: 0px 10px;
 }
 
 /* Add an active class to the active dropdown button */
@@ -149,21 +142,35 @@ li {
     font-family: 'Gidole';
     text-transform: uppercase;
     font-weight: bold;
+    font-size: x-large;
 }
 
 /* Optional: Style the caret down icon */
 .fa-caret-down {
   float: right;
   padding-right: 8px;
+  font-size: 110%;
+}
+
+@media screen and (max-width: 600px) {
+    .sidenav {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+    .main {
+        margin-right: 0;
+    }
 }
 
 
 
 
-
 </style>
-
 <head>
+    <!-- Mobile CSS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Lilita One -->
     <!-- Libre Franklin -->
@@ -219,7 +226,7 @@ li {
     </div>
 
 <!-- The List -->
-<ol id="list_for_freeform_0" class="tags index group"></ol>
+    <ol id="list_for_freeform_0" class="tags index group"></ol>
 
 <script>
     let allTags = [];
