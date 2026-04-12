@@ -538,7 +538,6 @@
         "secret relationship but they suck at hiding",
         "Self-Sacrifice",
         "A significant amount of swearing in this fic",
-        "Stalking",
         "Submissive Bakugou Katsuki",
         "Taking care of a sick/injured animal",
         "Teacher-Student Relationship",
@@ -556,15 +555,31 @@
         "Villain Midoriya Izuku",
         "villain uses their love against them",
         "we’re not together but i’ll always come home to you",
-        "Yandere in Recovery Midoriya Izuku",
         "Yearn off"
     ],
-    "au": [],
+    "au": [
+        "Alternate Universe - Actors",
+        "Alternate Universe - Angels & Demons",
+        "Alternate Universe - Fantasy",
+        "Alternate Universe - Idols",
+        "Alternate Universe - Road Trip",
+        "Alternate Universe - Royalty",
+        "Alternate Universe - Small Town",
+        "Alternate Universe - Soulmates",
+        "Alternate Universe - Steampunk",
+        "Alternate Universe - Summer Camp",
+        "Alternate Universe - The Legend of Zelda",
+        "Hybrid AU",
+        "Hanahaki Disease",
+        "Time travel fuckery"
+    ],
     "angst": [],
     "dddne": [
         "Attic Wife Bakugou Katsuki",
         "Body Horror",
-        "Sibling Incest"
+        "Sibling Incest",
+        "Stalking",
+        "Yandere in Recovery Midoriya Izuku"
     ],
     "silly": []
 }
