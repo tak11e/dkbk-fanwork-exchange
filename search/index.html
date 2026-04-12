@@ -31,7 +31,7 @@
 }
 
 /* Style the sidenav links and the dropdown button */
-.sidenav a, .dropdown-btn {
+.sidenav span, .dropdown-btn {
     font-family: 'Libre Franklin';
     padding: 6px 8px 6px 16px;
     text-decoration: none;
@@ -47,7 +47,7 @@
 }
 
 /* On mouse-over */
-.sidenav a:hover, .dropdown-btn:hover {
+.sidenav span:hover, .dropdown-btn:hover {
   color: #f1f1f1;
 }
 
@@ -112,28 +112,31 @@
             <i class="fas fa-caret-down"></i>
         </button>
         <div class="dropdown-container">
-            <a href="#">Link 1</a>
-            <a href="#">Link 2</a>
-            <a href="#">Link 3</a>
+            <div class="filters">
+                <span><input type="checkbox" onchange="toggleFilter('nsfw', 'include')">NSFW</span>
+                <span><input type="checkbox" onchange="toggleFilter('sfw', 'include')">SFW</span>
+                <span><input type="checkbox" onchange="toggleFilter('dddne', 'include')">DDDNE</span>
+                <span><input type="checkbox" onchange="toggleFilter('angst', 'include')">Angst</span>
+                <span><input type="checkbox" onchange="toggleFilter('silly', 'include')">Silly</span>
+                <span><input type="checkbox" onchange="toggleFilter('au', 'include')">AUs</span>
+            </div>
         </div>
         <button class="dropdown-btn">Exclude
             <i class="fas fa-caret-down"></i>
         </button>
         <div class="dropdown-container">
-            <a href="#">Link 1</a>
-            <a href="#">Link 2</a>
-            <a href="#">Link 3</a>
+            <div class="filters">
+                <span><input type="checkbox" onchange="toggleFilter('nsfw', 'exclude')">NSFW</span>
+                <span><input type="checkbox" onchange="toggleFilter('sfw', 'exclude')">SFW</span>
+                <span><input type="checkbox" onchange="toggleFilter('dddne', 'exclude')">DDDNE</span>
+                <span><input type="checkbox" onchange="toggleFilter('angst', 'exclude')">Angst</span>
+                <span><input type="checkbox" onchange="toggleFilter('silly', 'exclude')">Silly</span>
+                <span><input type="checkbox" onchange="toggleFilter('au', 'exclude')">AUs</span>
+            </div>
         </div>
     </div>
     <div class="public-filters" style="margin: 20px 0;">
         <strong>Filter By:</strong>
-        <button onclick="setGroup('all')">All</button>
-        <button onclick="setGroup('nsfw')">NSFW</button>
-        <button onclick="setGroup('sfw')">SFW</button>
-        <button onclick="setGroup('dddne')">DDDNE</button>
-        <button onclick="setGroup('angst')">Angst</button>
-        <button onclick="setGroup('silly')">Silly</button>
-        <button onclick="setGroup('au')">AUs</button>
     </div>
 
 <!-- The List -->
@@ -145,6 +148,10 @@
 
     let tagData = { all: [], nsfw: [], sfw: [], au: [], angst: [], dddne: [], silly: []};
     let currentGroup = 'all' // default view
+
+    // Track multiple active filters
+    let activeIncludes = new Set();
+    let activeExcludes = new Set();
 
     const searchInput = document.getElementById('tagSearch');
     const listElement = document.getElementById('list_for_freeform_0');
@@ -193,33 +200,54 @@
     }
 
     function renderTags(str = '') {
-        const activeTags = tagData[currentGroup] || [];
-        const filtered = activeTags.filter(tag => 
+        let filtered;
+
+        if (activeIncludes.size == 0) {
+            filtered = [...tagData.all];
+        } else {
+            let combined = [];
+            activeIncludes.forEach(group => {
+                combined = combined.concat(tagData[group] || []);
+            });
+
+            filtered = [...new Set(combined)];
+        }
+
+        activeExcludes.forEach(group => {
+            const excludeList = tagData[group] || [];
+            filtered = filtered.filter(tag => !excludeList.includes(tag));
+        });
+
+        filtered = filtered.filter(tag =>
             tag.toLowerCase().includes(str.toLowerCase())
         );
 
         let html = "";
 
         filtered.forEach((tag) => {
-            if (tag.toLowerCase().includes(str.toLowerCase())) {
-                const isChecked = pinnedTags.has(tag) ? 'checked' : '';
-
-                const globalIndex = tagData.all.indexOf(tag)
+            const isChecked = pinnedTags.has(tag) ? 'checked' : '';
+            const globalIndex = tagData.all.indexOf(tag);
 
                 html += `
                     <li>
                         <input type="checkbox" ${isChecked} onchange="togglePinByIndex(${globalIndex})" style="display:inline-block; vertical-align: middle;">
                         <span style="vertical-align: middle;">${tag}</span>
                     </li>`;
-            }
         });
         listElement.innerHTML = html;
     }
 
     //filter
-    window.setGroup = (groupName) => {
-        currentGroup = groupName;
-        renderTags(searchInput.value)
+    window.toggleFilter = (groupName, type) => {
+        const targetSet = (type == 'include') ? activeIncludes : activeExcludes;
+
+        if (targetSet.has(groupName)) {
+            targetSet.delete(groupName);
+        } else {
+            targetSet.add(groupName);
+        }
+
+        renderTags(searchInput.value);
     }
 
     //copy to clipboard
