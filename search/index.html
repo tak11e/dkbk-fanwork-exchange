@@ -1,77 +1,140 @@
 <!DOCTYPE html>
 <html lang="en">
 <style>
-    body.admin-mode {
-        border: 5px solid red;
-        box-sizing: border-box;
-        min-height: 100vh;
-    }
-
-    #adminTools {
-        display: none;
-        background: #ffebeb;
-        padding: 15px;
-        border: 1px dashed red;
-        margin: 10px 0;
-    }
-
-    body.admin-mode #adminTools {
+    /* .filters {
         display: block;
+        background: #ddd;
+        border: 2px solid #f3efec;
+        margin: 0.643em;
+        padding: 0.643em;
+        box-shadow: inset 1px 0 5px #999;
+        float: right;
     }
+    .filter {
+        padding: 0 50px;
+        width: 100%;
+        vertical-align: middle;
+        display: inline-block;
+        position: relative;
+    } */
+
+.sidenav {
+  height: 100%;
+  width: 200px;
+  position: fixed;
+  z-index: 1;
+  top: 10%;
+  right: 0;
+  background-color: #111;
+  overflow-x: hidden;
+  padding-top: 20px;
+}
+
+/* Style the sidenav links and the dropdown button */
+.sidenav a, .dropdown-btn {
+    font-family: 'Libre Franklin';
+    padding: 6px 8px 6px 16px;
+    text-decoration: none;
+    font-size: 20px;
+    color: #818181;
+    display: block;
+    border: none;
+    background: none;
+    width:100%;
+    text-align: left;
+    cursor: pointer;
+    outline: none;
+}
+
+/* On mouse-over */
+.sidenav a:hover, .dropdown-btn:hover {
+  color: #f1f1f1;
+}
+
+/* Main content */
+.main {
+  margin-left: 200px; /* Same as the width of the sidenav */
+  font-size: 20px; /* Increased text to enable scrolling */
+  padding: 0px 10px;
+}
+
+/* Add an active class to the active dropdown button */
+.active {
+  background-color: green;
+  color: white;
+}
+
+/* Dropdown container (hidden by default). Optional: add a lighter background color and some left padding to change the design of the dropdown content */
+.dropdown-container {
+  display: none;
+  background-color: #262626;
+  padding-left: 8px;
+}
+
+/* Optional: Style the caret down icon */
+.fa-caret-down {
+  float: right;
+  padding-right: 8px;
+}
+
 </style>
 
-<head></head>
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Lilita One -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lilita+One&display=swap" rel="stylesheet">
+    <!-- Libre Franklin -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:ital,wght@0,100..900;1,100..900&family=Lilita+One&display=swap" rel="stylesheet">
+
+</head>
 <body>
-<!-- Admin Trigger -->
-<div style="position: absolute; top: 10px; right: 10px; z-index: 1000;">
-    <a href="javascript:void(0)" onclick="openModModal()" style="font-size: 12px; color: #888; text-decoration: none;">Are you a moderator?</a>
-</div>
+    <!-- The Search Bar & Pinned Buttons -->
+    <input type="text" id="tagSearch" placeholder="Search tags..." style="width: 100%; padding: 10px; margin-bottom: 10px;">
 
-<!-- Pop-up Container -->
- <div id="modModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
-    <div style="background: white; padding: 20px; border-radius: 8px; text-align: center; width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
-        <h3>Moderator Access</h3>
-        <p>Please enter the debug key:</p>
-        <input type="password" id="modPassField" style="width: 80%; padding: 8px; margin-bottom: 10px;">
-        <br>
-        <button onclick="checkModPass()">Login</button>
-        <button onclick="closeModModal()" style="background: #ccc; border: none; cursor: pointer;">Cancel</button>
+    <div style="margin-bottom: 10px;">
+        <button onclick="copyPinned()">Copy All</button>
+        <button onclick="clearPinned()" style="background: #ffcccc; border: 1px solid #999; margin-left: 10px; cursor: pointer;">Clear All</button>
     </div>
- </div>
 
- <!-- Admin Tools Section -->
-  <div id="adminTools">
-    <strong>Admin Debug</strong>
-    <button onclick="assignFliterToPinned()" style="background: darkred; color: white; cursor: pointer;">
-        Filter Tags
-    </button>
-  </div>
+    <!-- Pinned Section -->
+    <div id="pinnedSection" style="display:none; background: #f0f0f0; padding: 10px; border: 1px solid #ccc; margin: 10px 0;">
+        <strong>Current Selection:</strong>
+        <ul id="pinnedList" style="list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;"></ul>
+    </div>
 
-<!-- The Search Bar & Pinned Buttons -->
-<input type="text" id="tagSearch" placeholder="Search tags..." style="width: 100%; padding: 10px; margin-bottom: 10px;">
-
-<div style="margin-bottom: 10px;">
-    <button onclick="copyPinned()">Copy All</button>
-    <button onclick="clearPinned()" style="background: #ffcccc; border: 1px solid #999; margin-left: 10px; cursor: pointer;">Clear All</button>
-</div>
-
-<!-- Pinned Section -->
-<div id="pinnedSection" style="display:none; background: #f0f0f0; padding: 10px; border: 1px solid #ccc; margin: 10px 0;">
-    <strong>Current Selection:</strong>
-    <ul id="pinnedList" style="list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;"></ul>
-</div>
-
-<!-- Filters -->
- <div class="public-filters" style="margin: 20px 0;">
-    <strong>Filter By:</strong>
-    <button onclick="setGroup('all')">All</button>
-    <button onclick="setGroup('nsfw')">NSFW</button>
-    <button onclick="setGroup('sfw')">SFW</button>
-    <button onclick="setGroup('dddne')">DDDNE</button>
-    <button onclick="setGroup('angst')">Angst</button>
-    <button onclick="setGroup('silly')">Silly</button>
-    <button onclick="setGroup('au')">AUs</button>
- </div>
+    <!-- Filters -->
+    <div class="sidenav">
+        <button class="dropdown-btn">Include
+            <i class="fas fa-caret-down"></i>
+        </button>
+        <div class="dropdown-container">
+            <a href="#">Link 1</a>
+            <a href="#">Link 2</a>
+            <a href="#">Link 3</a>
+        </div>
+        <button class="dropdown-btn">Exclude
+            <i class="fas fa-caret-down"></i>
+        </button>
+        <div class="dropdown-container">
+            <a href="#">Link 1</a>
+            <a href="#">Link 2</a>
+            <a href="#">Link 3</a>
+        </div>
+    </div>
+    <div class="public-filters" style="margin: 20px 0;">
+        <strong>Filter By:</strong>
+        <button onclick="setGroup('all')">All</button>
+        <button onclick="setGroup('nsfw')">NSFW</button>
+        <button onclick="setGroup('sfw')">SFW</button>
+        <button onclick="setGroup('dddne')">DDDNE</button>
+        <button onclick="setGroup('angst')">Angst</button>
+        <button onclick="setGroup('silly')">Silly</button>
+        <button onclick="setGroup('au')">AUs</button>
+    </div>
 
 <!-- The List -->
 <ol id="list_for_freeform_0" class="tags index group"></ol>
@@ -83,43 +146,12 @@
     let tagData = { all: [], nsfw: [], sfw: [], au: [], angst: [], dddne: [], silly: []};
     let currentGroup = 'all' // default view
 
-    const SECRET_KEY = "4f6173697356696f6c696e353237";
-
     const searchInput = document.getElementById('tagSearch');
     const listElement = document.getElementById('list_for_freeform_0');
     const pinnedList = document.getElementById('pinnedList');
     const pinnedSection = document.getElementById('pinnedSection');
     const modModal = document.getElementById('modModal')
     const modPassField = document.getElementById('modPassField')
-
-    function openModModal() {
-        modModal.style.display = 'flex';
-    }
-
-    function closeModModal() {
-        modModal.style.display = 'none';
-        modPassField.value = '';
-    }
-
-    function checkModPass() {
-        const input = modPassField.value;
-
-        const toHex = (str) => {
-            return Array.from(new TextEncoder().encode(str))
-                .map(b => b.toString(16).padStart(2, '0'))
-                .join('');
-        };
-
-        const inputHex = toHex(input);
-
-        if (inputHex == SECRET_KEY) {
-            alert("Debug mode activated.");
-            document.body.classList.add('admin-mode');
-            closeModModal();
-        } else {
-            alert("Incorrect key.")
-        }
-    }
 
     function loadFromStorage() {
         const saved = localStorage.getItem('myPinnedTags');
@@ -209,8 +241,6 @@
         }
     };
 
-    //admin filtering
-
     window.addEventListener('load', () => {
         // DEBUG: Let's see if the script even finds your HTML elements
         if (!searchInput || !listElement) {
@@ -233,6 +263,22 @@
                 listElement.innerHTML = "<li>Error: tags not found</li>"
             })
     });
+
+    // FILTER LOGIC //
+    var dropdown = document.getElementsByClassName("dropdown-btn");
+    var i;
+
+    for (i = 0; i < dropdown.length; i++) {
+    dropdown[i].addEventListener("click", function() {
+        this.classList.toggle("active");
+        var dropdownContent = this.nextElementSibling;
+        if (dropdownContent.style.display === "block") {
+        dropdownContent.style.display = "none";
+        } else {
+        dropdownContent.style.display = "block";
+        }
+    });
+    }
 </script>
 
 
