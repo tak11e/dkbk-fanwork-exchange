@@ -405,30 +405,40 @@
 
     async function initCarousel() {
         try {
-            const response = await fetch('collection_works.json');
+            const response = await fetch('https://carousel-script.takiepeterson.workers.dev');
             const data = await response.json();
-            const seed = getDailySeed();
-            const rnd = splitmix32(hashString(seed));
+            const today = new Date().toLocaleDateString('en-US');
 
-            const getRandomTwo = (rating, type) => {
-                const list = [...(data[rating]?.[type] || [])];
-                const selected = [];
-            
-                // Pick 2 using the seeded random
-                for(let i = 0; i < 2 && list.length > 0; i++) {
-                    const index = Math.floor(rnd() * list.length);
-                    const item = list.splice(index, 1)[0];
-                    selected.push({ ...item, rating, type });
+            works = [];
+            for (const rating in data) {
+                for (const type in data[rating]) {
+                    const picked = data[rating][type].filter(w => w.last_featured == today);
+                    works.push(...picked);
                 }
-                return selected;
-            };
+            }
+            
+            // const seed = getDailySeed();
+            // const rnd = splitmix32(hashString(seed));
 
-            works = [
-                ...getRandomTwo('sfw', 'fic'),
-                ...getRandomTwo('sfw', 'art'),
-                ...getRandomTwo('nsfw', 'fic'),
-                ...getRandomTwo('nsfw', 'art')
-            ];
+            // const getRandomTwo = (rating, type) => {
+            //     const list = [...(data[rating]?.[type] || [])];
+            //     const selected = [];
+            
+            //     // Pick 2 using the seeded random
+            //     for(let i = 0; i < 2 && list.length > 0; i++) {
+            //         const index = Math.floor(rnd() * list.length);
+            //         const item = list.splice(index, 1)[0];
+            //         selected.push({ ...item, rating, type });
+            //     }
+            //     return selected;
+            // };
+
+            // works = [
+            //     ...getRandomTwo('sfw', 'fic'),
+            //     ...getRandomTwo('sfw', 'art'),
+            //     ...getRandomTwo('nsfw', 'fic'),
+            //     ...getRandomTwo('nsfw', 'art')
+            // ];
 
             // Build HTML for each item
             track.innerHTML = works.map(work => {
@@ -493,15 +503,6 @@
             console.error("Fetch error:", err);
             track.innerHTML = '<div class="carousel-item">Failed to load local data.</div>';
         }
-    }
-
-    function hashString(str) {
-        let hash = 0;
-        for (let i = 0; i < str.length; i++) {
-            hash = ((hash << 5) - hash) + str.charCodeAt(i);
-            hash |= 0;
-        }
-        return hash;
     }
 
     function updateUI() {
