@@ -52,11 +52,23 @@ def scrape_all_pages():
             for h4 in soup.find_all('h4', class_='heading'):
                 link = h4.find('a', href=True)
                 if link and '/works/' in link['href']:
+
+                    # Find authors
+                    author_elements = h4.find_all('a', rel='author')
+                    authors = [a.get_text(strip=True) for a in author_elements]
+        
+                    # Handle cases where works are posted anonymously
+                    if not authors:
+                        authors = ["Anon"]
+                        
+                    work_title = link.get_text(strip=True)
+                    print(f"Scraping: {work_title} by {', '.join(authors)}")
+
                     blurb = h4.find_parent('li')
                     if not blurb: continue
 
                     work_url = "https://archiveofourown.org" + link['href']
-                    print(f"    -> Deep scraping: {link.get_text(strip=True)}")
+                    print(f"    -> Deep scraping.")
 
                     word_count_el = blurb.select_one('dd.words')
                     word_count = int(word_count_el.get_text().replace(',', '')) if word_count_el and word_count_el.get_text().strip() else 0
@@ -86,6 +98,7 @@ def scrape_all_pages():
 
                     work_data = {
                         "title": link.get_text(strip=True),
+                        "authors": authors,
                         "url": work_url,
                         "summary": summary_html,
                         "tags": [t.get_text(strip=True) for t in tag_elements],
@@ -104,6 +117,10 @@ def scrape_all_pages():
                     type_key = "art" if is_art else "fic"
 
                     organized[rating_key][type_key].append(work_data)
+
+                    with open("collection_works.json", "w") as f:
+                        json.dump(organized, f, indent=4)
+                    print(f"    -> Progress saved to collection_works.json")
                     found_on_page += 1
 
             print(f"    -> Found {found_on_page} works.")
