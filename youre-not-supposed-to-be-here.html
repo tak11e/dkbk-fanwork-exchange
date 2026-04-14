@@ -407,12 +407,18 @@
         try {
             const response = await fetch('https://carousel-script.takiepeterson.workers.dev');
             const data = await response.json();
-            const today = new Date().toLocaleDateString('en-US');
+            const todayDate = new Date();
+            const today = todayDate.toLocaleDateString('en-US'); // e.g. "4/13/2026"
+            const todayAlt = todayDate.toLocaleDateString('en-US', { 
+                month: '2-digit', day: '2-digit', year: 'numeric' 
+            });
 
             works = [];
             for (const rating in data) {
                 for (const type in data[rating]) {
-                    const picked = data[rating][type].filter(w => w.last_featured == today);
+                    const picked = data[rating][type].filter(w => 
+                        w.last_featured == today || w.last_featured == todayAlt
+                    );
                     works.push(...picked);
                 }
             }
