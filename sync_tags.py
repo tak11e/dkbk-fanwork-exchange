@@ -30,13 +30,7 @@ def get_tags():
             unique_tags = list(dict.fromkeys(all_tags))
 
             organized = {
-                "all": all_tags,
-                "nsfw": [],
-                "sfw": [],
-                "au": [],
-                "angst": [],
-                "dddne": [],
-                "silly": []
+                "all": all_tags
             }
             
             with open('tags.json', 'w') as f:
