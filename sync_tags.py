@@ -33,7 +33,7 @@ def get_tags():
                 "all": all_tags
             }
             
-            with open('tags.json', 'w') as f:
+            with open('search/tags.json', 'w') as f:
                 json.dump(organized, f, indent=4)
             
             print(f"Success! Found {len(freeform_lists)} separate lists.")
