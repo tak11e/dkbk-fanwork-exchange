@@ -3,8 +3,10 @@ from bs4 import BeautifulSoup
 import json
 import re
 
-# Your specific Tag Set URL
+# Tag Set URL
 url = "https://archiveofourown.org/tag_sets/28436"
+
+file_path = 'search/tags.json'
 
 def get_tags():
     print("Attempting to bypass Cloudflare (this may take a moment)...")
@@ -32,8 +34,20 @@ def get_tags():
             organized = {
                 "all": all_tags
             }
+
+            if os.path.exists(file_path):
+                try:
+                    with open(file_path, 'r') as f:
+                        existing_data = json.load(f)
+                    
+                    for key, value in existing_data.items():
+                        if key != "all":
+                            organized[key] = value
+                    print(f"Preserved existing categories: {list(existing_data.keys())}")
+                except Exception as read_error:
+                    print(f"Could not read existing file, creating new structure: {read_error}")
             
-            with open('search/tags.json', 'w') as f:
+            with open(file_path, 'w') as f:
                 json.dump(organized, f, indent=4)
             
             print(f"Success! Found {len(freeform_lists)} separate lists.")
