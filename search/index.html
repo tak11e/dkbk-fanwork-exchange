@@ -269,7 +269,7 @@ li {
     let allTags = [];
     let pinnedTags = new Set();
 
-    let tagData = { all: [], nsfw: [], sfw: [], au: [], angst: [], dddne: [], silly: []};
+    let tagData = { all: [], round_specific: [], nsfw: [], sfw: [], au: [], angst: [], dddne: [], silly: []};
     let currentGroup = 'all' // default view
 
     // Track multiple active filters
@@ -292,7 +292,7 @@ li {
     }
     //add tag to pinned
     function togglePinByIndex(index) {
-        const tag = tagData.all[index]
+        const tag = (sourceGroup === 'round_specific') ? tagData.round_specific[index] : tagData.all[index];
 
         if (pinnedTags.has(tag)) {
             pinnedTags.delete(tag);
@@ -326,7 +326,7 @@ li {
         let filtered;
 
         if (activeIncludes.size == 0) {
-            filtered = [...tagData.all];
+            filtered = [...new Set([...tagData.all, ...(tagData.round_specific || [])])];
         } else {
             let combined = [];
             activeIncludes.forEach(group => {
@@ -349,13 +349,22 @@ li {
 
         filtered.forEach((tag) => {
             const isChecked = pinnedTags.has(tag) ? 'checked' : '';
-            const globalIndex = tagData.all.indexOf(tag);
+
+            let globalIndex = tagData.all.indexOf(tag);
+            let sourceGroup = 'all';
+            let textColorStyle = '';
+
+            if (tagData.round_specific && tagData.round_specific.includes(tag)) {
+                globalIndex = tagData.round_specific.indexOf(tag);
+                sourceGroup = 'round_specific';
+                textColorStyle = 'color: #ff4500;';
+            }
 
                 html += `
                     <li>
                         <label>
                             <input type="checkbox" ${isChecked} onchange="togglePinByIndex(${globalIndex})">
-                            <span style="vertical-align: middle;">${tag}</span>
+                            <span style="vertical-align: middle; ${textColorStyle}">${tag}</span>
                         </label>
                     </li>`;
         });
