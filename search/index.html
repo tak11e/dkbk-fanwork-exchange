@@ -292,31 +292,9 @@ li {
     }
     //add tag to pinned
 
-    function togglePinByText(tag) {
-        if (pinnedTags.has(tag)) {
-            pinnedTags.delete(tag)
-        } else {
-            if (pinnedTags.size >= 20) { 
-                alert("Too many tags! The DKBK Fanwork Exchange Collection has a limit of up to 20 tags.")
-                renderTags(searchInput.value)
-                return
-            }
-            pinnedTags.add(tag);
-        }
-
-        localStorage.setItem('myPinnedTags', JSON.stringify(Array.from(pinnedTags)));
-
-        updatePinnedUI();
-        renderTags(searchInput.value);
-    }
-
-
-
-    // function togglePinByIndex(index) {
-    //     const tag = (sourceGroup === 'round_specific') ? tagData.round_specific[index] : tagData.all[index];
-
+    // function togglePinByText(tag) {
     //     if (pinnedTags.has(tag)) {
-    //         pinnedTags.delete(tag);
+    //         pinnedTags.delete(tag)
     //     } else {
     //         if (pinnedTags.size >= 20) { 
     //             alert("Too many tags! The DKBK Fanwork Exchange Collection has a limit of up to 20 tags.")
@@ -332,6 +310,30 @@ li {
     //     renderTags(searchInput.value);
     // }
 
+
+
+    function togglePinByIndex(index) {
+        const tag = (sourceGroup === 'round_specific') ? tagData.round_specific[index] : tagData.all[index];
+
+        if (!tag) return;
+
+        if (pinnedTags.has(tag)) {
+            pinnedTags.delete(tag);
+        } else {
+            if (pinnedTags.size >= 20) { 
+                alert("Too many tags! The DKBK Fanwork Exchange Collection has a limit of up to 20 tags.")
+                renderTags(searchInput.value)
+                return
+            }
+            pinnedTags.add(tag);
+        }
+
+        localStorage.setItem('myPinnedTags', JSON.stringify(Array.from(pinnedTags)));
+
+        updatePinnedUI();
+        renderTags(searchInput.value);
+    }
+
     function updatePinnedUI() {
         if (pinnedTags.size > 0) {
             pinnedSection.style.display = 'block';
@@ -344,50 +346,118 @@ li {
     }
 
     function renderTags(str = '') {
-        let filtered;
+        let masterPool = [];
 
-        if (activeIncludes.size == 0) {
-            filtered = [...new Set([...tagData.all, ...(tagData.round_specific || [])])];
-            filtered.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
-        } else {
-            let combined = [];
-            activeIncludes.forEach(group => {
-                combined = combined.concat(tagData[group] || []);
+        if (tagData.all) {
+            tagData.all.forEach((tag, idx) => {
+                masterPool.push({ text: tag, originalIndex: idx, sourceGroup: 'all' });
             });
+        }
 
-            filtered = [...new Set(combined)];
-            filtered.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+        if (tagData.round_specific) {
+            tagData.round_specific.forEach((tag, idx) => {
+                masterPool.push({ text: tag, originalIndex: idx, sourceGroup: 'round_specific' });
+            });
+        }
+
+        // Remove duplicate text objects (favoring round_specific coloring if duplicates exist)
+        let uniqueMap = new Map();
+        masterPool.forEach(item => {
+            if (!uniqueMap.has(item.text) || item.sourceGroup === 'round_specific') {
+                uniqueMap.set(item.text, item);
+            }
+        });
+        let displayList = Array.from(uniqueMap.values());
+
+        // Process active filter inclusions/exclusions
+        if (activeIncludes.size > 0) {
+            displayList = displayList.filter(item => {
+                return Array.from(activeIncludes).some(group => {
+                    return tagData[group] && tagData[group].includes(item.text);
+                });
+            });
         }
 
         activeExcludes.forEach(group => {
             const excludeList = tagData[group] || [];
-            filtered = filtered.filter(tag => !excludeList.includes(tag));
+            displayList = displayList.filter(item => !excludeList.includes(item.text));
         });
 
-        filtered = filtered.filter(tag =>
-            tag.toLowerCase().includes(str.toLowerCase())
-        );
+        // Process search input string matching
+        if (str) {
+            displayList = displayList.filter(item =>
+                item.text.toLowerCase().includes(str.toLowerCase())
+            );
+        }
 
+        // Sort everything alphabetically without losing our index mappings
+        displayList.sort((a, b) => a.text.localeCompare(b.text, undefined, { sensitivity: 'base' }));
+
+        // Generate the HTML output
         let html = "";
-
-        filtered.forEach((tag) => {
-            const isChecked = pinnedTags.has(tag) ? 'checked' : '';
-
+        displayList.forEach((item) => {
+            const isChecked = pinnedTags.has(item.text) ? 'checked' : '';
             let textColorStyle = '';
 
             if (tagData.round_specific && tagData.round_specific.includes(tag)) {
                 textColorStyle = 'color: #FDBA12;';
             }
 
-                html += `
-                    <li>
-                        <label>
-                            <input type="checkbox" ${isChecked} onchange="togglePinByText(\`${tag.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)">
-                            <span style="vertical-align: middle; ${textColorStyle}">${tag}</span>
-                        </label>
-                    </li>`;
+            html += `
+                <li>
+                    <label>
+                        <input type="checkbox" ${isChecked} onchange="togglePinByIndex(${item.originalIndex}, '${item.sourceGroup}')">
+                        <span style="vertical-align: middle; ${textColorStyle}">${item.text}</span>
+                    </label>
+                </li>`;
         });
         listElement.innerHTML = html;
+
+
+        // let filtered;
+
+        // if (activeIncludes.size == 0) {
+        //     filtered = [...new Set([...tagData.all, ...(tagData.round_specific || [])])];
+        //     filtered.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+        // } else {
+        //     let combined = [];
+        //     activeIncludes.forEach(group => {
+        //         combined = combined.concat(tagData[group] || []);
+        //     });
+
+        //     filtered = [...new Set(combined)];
+        //     filtered.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+        // }
+
+        // activeExcludes.forEach(group => {
+        //     const excludeList = tagData[group] || [];
+        //     filtered = filtered.filter(tag => !excludeList.includes(tag));
+        // });
+
+        // filtered = filtered.filter(tag =>
+        //     tag.toLowerCase().includes(str.toLowerCase())
+        // );
+
+        // let html = "";
+
+        // filtered.forEach((tag) => {
+        //     const isChecked = pinnedTags.has(tag) ? 'checked' : '';
+
+        //     let textColorStyle = '';
+
+        //     if (tagData.round_specific && tagData.round_specific.includes(tag)) {
+        //         textColorStyle = 'color: #FDBA12;';
+        //     }
+
+        //         html += `
+        //             <li>
+        //                 <label>
+        //                     <input type="checkbox" ${isChecked} onchange="togglePinByText(\`${tag.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)">
+        //                     <span style="vertical-align: middle; ${textColorStyle}">${tag}</span>
+        //                 </label>
+        //             </li>`;
+        // });
+        // listElement.innerHTML = html;
     }
 
     //filter
