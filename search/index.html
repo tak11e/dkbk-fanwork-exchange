@@ -339,8 +339,15 @@ li {
     function updatePinnedUI() {
         if (pinnedTags.size > 0) {
             pinnedSection.style.display = 'block';
-            pinnedList.innerHTML = Array.from(pinnedTags).map(tag =>
-                `<span>${tag}</span>`
+            pinnedList.innerHTML = Array.from(pinnedTags).map(tag => {
+                let textColorStyle = '';
+
+                if (tagData.round_specific && tagData.round_specific.includes(tag)) {
+                    textColorStyle = 'color: #FDBA12;';
+                }
+
+                return `<span style="${textColorStyle}">${tag}</span>` 
+            }
             ).join(' ');
         } else {
             pinnedSection.style.display = 'none';
