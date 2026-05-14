@@ -399,7 +399,7 @@ li {
             const isChecked = pinnedTags.has(item.text) ? 'checked' : '';
             let textColorStyle = '';
 
-            if (tagData.round_specific && tagData.round_specific.includes(tag)) {
+            if (item.sourceGroup === 'round_specific') {
                 textColorStyle = 'color: #FDBA12;';
             }
 
@@ -412,9 +412,9 @@ li {
                 </li>`;
         });
         listElement.innerHTML = html;
+    }
 
-
-        // let filtered;
+    // let filtered;
 
         // if (activeIncludes.size == 0) {
         //     filtered = [...new Set([...tagData.all, ...(tagData.round_specific || [])])];
@@ -458,7 +458,6 @@ li {
         //             </li>`;
         // });
         // listElement.innerHTML = html;
-    }
 
     //filter
     window.toggleFilter = (groupName, type) => {
