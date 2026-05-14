@@ -269,6 +269,8 @@ li {
     let allTags = [];
     let pinnedTags = new Set();
 
+    let allTagsMaster = [];
+
     let tagData = { all: [], round_specific: [], nsfw: [], sfw: [], au: [], angst: [], dddne: [], silly: []};
     let currentGroup = 'all' // default view
 
@@ -312,8 +314,8 @@ li {
 
 
 
-    function togglePinByIndex(index) {
-        const tag = (sourceGroup === 'round_specific') ? tagData.round_specific[index] : tagData.all[index];
+    function togglePinByIndex(globalMasterIndex) {
+        const tag = allTagsMaster[globalMasterIndex];
 
         if (!tag) return;
 
@@ -403,10 +405,12 @@ li {
                 textColorStyle = 'color: #FDBA12;';
             }
 
+            const safeGlobalIndex = allTagsMaster.indexOf(item.text);
+
             html += `
                 <li>
                     <label>
-                        <input type="checkbox" ${isChecked} onchange="togglePinByIndex(${item.originalIndex}, '${item.sourceGroup}')">
+                        <input type="checkbox" ${isChecked} onchange="togglePinByIndex(${safeGlobalIndex})">
                         <span style="vertical-align: middle; ${textColorStyle}">${item.text}</span>
                     </label>
                 </li>`;
@@ -502,6 +506,10 @@ li {
             .then(response => response.json())
             .then(data => {
                 tagData = data;
+
+                // Create a permanent, flat master array of every tag text available
+                allTagsMaster = [...new Set([...(data.all || []), ...(data.round_specific || [])])];
+
                 loadFromStorage();
                 renderTags();
 
