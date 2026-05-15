@@ -391,9 +391,31 @@ li {
     }
 
     function loadFromStorage() {
-        const saved = localStorage.getItem('myPinnedTags');
-        if (saved) {
-            pinnedTags = new Set(JSON.parse(saved));
+        // Check for URL params
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlPins = urlParams.get('pins');
+
+        if (urlPins) {
+            pinnedTags = new Set();
+
+            // Convert params back into the original indexing
+            const structuralIndexes = urlPins.split(',').map(num => parseInt(num, 10));
+
+            structuralIndexes.forEach(idx => {
+                const matchedTagString = allTagsMaster[idx];
+                if (matchedTagString) {
+                    pinnedTags.add(matchedTagString);
+                }
+            });
+
+            // Save it to local storage right away so they don't lose it
+            localStorage.setItem('myPinnedTags', JSON.stringify(Array.from(pinnedTags)));
+            console.log("Draft configuration loaded successfully from URL.");
+        } else {
+            const saved = localStorage.getItem('myPinnedTags');
+            if (saved) {
+                pinnedTags = new Set(JSON.parse(saved));
+            }
         }
 
         updatePinnedUI();
@@ -472,6 +494,22 @@ li {
             } else {
                 progressWarning.textContent = "";
                 progressWarning.classList.remove('is-visible');
+            }
+        }
+
+        // Live URL updating to share pinned tags in URL
+        if (allTagsMaster && allTagsMaster.length > 0) {
+            if (pinnedTags.size > 0) {
+                const indexList = array.from(pinnedTags)
+                    .map(tag => allTagsMaster.indexOf(tag))
+                    .filter(idx => idx != -1);
+
+                const newQueryString = `?pins=${indexList.join(',')}`;
+
+                window.history.replaceState({}, document.title, window.location.pathname + newQueryString);
+            } else {
+                // If no tags, clear params
+                window.history.replaceState({}, document.title, window.location.pathname);
             }
         }
     }
