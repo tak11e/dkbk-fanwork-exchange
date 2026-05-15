@@ -194,7 +194,9 @@ li {
     }
 }
 
-
+.tag-counter {
+    font-size: small;
+}
 
 
 </style>
@@ -473,7 +475,7 @@ li {
                 allTagsMaster = [...new Set([...(data.all || []), ...(data.round_specific || [])])];
 
                 updateCategoryCounters(); 
-                
+
                 loadFromStorage();
                 renderTags();
 
