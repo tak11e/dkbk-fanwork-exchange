@@ -53,6 +53,20 @@ li {
     margin: 10px 0px;
     margin-right: 210px;
     font-size: larger;
+
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 1;
+    max-height: 500px;
+    overflow: hidden; 
+}
+.section-shrinking {
+    opacity: 0 !important;
+    max-height: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    border-color: transparent !important;
 }
 #pinnedList {
     list-style: none; 
@@ -64,12 +78,31 @@ li {
     margin-right: 200px;
     font-size: larger;
 }
+.pill-shrinking {
+    opacity: 0 !important;
+    transform: scale(0.7) !important;
+    max-width: 0 !important;
+    font-size: 0px !important;
+    line-height: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    border-color: transparent !important;
+    overflow: hidden !important;
+}
 #pinnedList span {
     background:#262626; 
     border: 1px solid #000; 
     padding: 6px 12px; 
     border-radius: 8px;
     color:#f0f0f0;
+
+    /* Transition to remove */
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 1;
+    transform: scale(1);
+    max-width: 100%;
 }
 
 #unpin:hover {
@@ -239,6 +272,10 @@ li {
 /* Helper rule to fade in the warning flag */
 .warning-alert-text.is-visible {
     opacity: 1;
+}
+
+#list-for-freeform_0 li:nth-child(even) {
+    background-color: #1e1e1e;
 }
 
 @media screen and (max-width: 600px) {
@@ -427,12 +464,48 @@ li {
         if (!tag) return;
 
         if (pinnedTags.has(tag)) {
+            const pinnedSectionElement = document.getElementById('pinnedSection');
+
+            const allPills = document.querySelectorAll('#pinnedList > span:not(#unpin)');
+            let targetPill = null;
+
+            allPills.forEach(pill => {
+                const pillText = pill.textContent.replace('×', '').trim();
+                if (pillText === tag.trim()) {
+                    targetPill = pill;
+                }
+            });
+
+            if (targetPill) {
+                targetPill.classList.add('pill-shrinking');
+
+                if (pinnedTags.size === 1 && pinnedSectionElement) {
+                    pinnedSectionElement.classList.add('section-shrinking');
+                }
+                
+                setTimeout(() => {
+                    executePinToggleLogic(tag);
+                    
+                    if (pinnedSectionElement) {
+                        pinnedSectionElement.classList.remove('section-shrinking');
+                    }
+                }, 300);
+                return;
+            }
+        }
+
+        executePinToggleLogic(tag);
+    }
+
+    //Helper function that handles data after the animation stops
+    function executePinToggleLogic(tag) {
+        if (pinnedTags.has(tag)) {
             pinnedTags.delete(tag);
         } else {
             if (pinnedTags.size >= 20) { 
-                alert("Too many tags! The DKBK Fanwork Exchange Collection has a limit of up to 20 tags.")
-                renderTags(searchInput.value)
-                return
+                alert("Too many tags! The DKBK Fanwork Exchange Collection has a limit of up to 20 tags.");
+                renderTags(searchInput.value);
+                return;
             }
             pinnedTags.add(tag);
         }
@@ -458,7 +531,7 @@ li {
                 return `
                     <span style="${textColorStyle}">
                         ${tag}
-                        <span id="unpin" style="cursor: pointer; border-radius: 0; border: 0;" onclick="togglePinByIndex(${safeGlobalIndex})">&times;</span>
+                        <span id="unpin" style="cursor: pointer; border-radius: 0; border: 0;" onclick="animateUnpin(event, ${safeGlobalIndex})">&times;</span>
                     </span>
                     `
                 }
@@ -588,6 +661,30 @@ li {
                 </li>`;
         });
         listElement.innerHTML = html;
+    }
+
+    //unpin animation
+    window.animateUnpin = (event, safeGlobalIndex) => {
+        const targetPill = event.target.closest('span:not(#unpin)');
+        const pinnedSectionElement = document.getElementById('pinnedSection');
+
+        if (targetPill) {
+            targetPill.classList.add('pill-shrinking');
+
+            if (pinnedTags.size == 1 && pinnedSectionElement) {
+                pinnedSectionElement.classList.add('section-shrinking');
+            }
+
+            setTimeout(() => {
+                togglePinByIndex(safeGlobalIndex);
+
+                if (pinnedSectionElement) {
+                    pinnedSectionElement.classList.remove('section-shrinking')
+                }
+            }, 300);
+        } else {
+            togglePinByIndex(safeGlobalIndex);
+        }
     }
 
     //filter
