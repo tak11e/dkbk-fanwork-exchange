@@ -199,6 +199,66 @@ li {
     }
 }
 
+/* FIXED: Locks both the search bar and the progress track to the top of the viewport */
+.sticky-search-header {
+    position: -webkit-sticky; /* Safari support */
+    position: sticky;
+    top: 0;
+    z-index: 100; /* Keeps it layered safely on top of your scrolling tag list */
+    
+    /* CRITICAL: Matches your website background color so tags don't visibly overlap behind the text */
+    background-color: #111; 
+    
+    padding-top: 12px;
+    padding-bottom: 4px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Progress Bar Outer Shield Framework */
+.progress-container {
+    width: 100%;
+    max-width: 100%;
+    margin: 8px 0 4px 0;
+    box-sizing: border-box;
+}
+
+/* Background Groove Line Track */
+.progress-bar {
+    width: 0%; /* Dynamic width handled by JS */
+    height: 6px;
+    border-radius: 4px;
+    background: linear-gradient(to right, #35826D, #F4912E) fixed;
+    background-size: 100% 100%;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Fluent expansion */
+}
+
+/* Meta Data Information Row below the gauge line */
+.progress-text-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+    font-family: 'Gidole', sans-serif;
+    font-size: 0.85em;
+    font-weight: bold;
+    color: #818181;
+    text-transform: uppercase;
+}
+
+/* Warning indicator highlight text element */
+.warning-alert-text {
+    color: #F4912E;
+    font-weight: bold;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+/* Helper rule to fade in the warning flag */
+.warning-alert-text.is-visible {
+    opacity: 1;
+}
+
+
 
 </style>
 <head>
@@ -222,7 +282,19 @@ li {
 </title>
 <body>
     <!-- The Search Bar & Pinned Buttons -->
-    <input type="text" id="tagSearch" placeholder="Search tags...">
+    <div class="sticky-search-header">
+
+        <input type="text" id="tagSearch" placeholder="Search tags...">
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div id="pinProgressBar" class="progress-bar"></div>
+            <div class="progress-text-row">
+                <span id="progressBarLabel">0/20 Tags Pinned</span>
+                <span id="progressBarWarning" class="warning-alert-text"></span>
+            </div>
+        </div>
+    </div>
 
     <div>
         <button onclick="copyPinned()" id="copyAll">Copy All</button>
@@ -311,8 +383,9 @@ li {
         const saved = localStorage.getItem('myPinnedTags');
         if (saved) {
             pinnedTags = new Set(JSON.parse(saved));
-            updatePinnedUI();
         }
+
+        updatePinnedUI();
     }
     //add tag to pinned
     function togglePinByIndex(globalMasterIndex) {
@@ -352,6 +425,36 @@ li {
             ).join(' ');
         } else {
             pinnedSection.style.display = 'none';
+        }
+
+        // Progress Bar
+        const currentCount = pinnedTags.size;
+        const maxLimit = 20;
+
+        const percentage = Math.min((currentCount / maxLimit) * 100, 100);
+
+        const progressBar = document.getElementById('pinProgressBar');
+        const progressLabel = document.getElementById('progressBarLabel');
+        const progressWarning = document.getElementById('progressBarWarning');
+
+        if (progressBar && progressLabel && progressWarning) {
+            // Update the meter gauge bar width
+            progressBar.style.width = `${percentage}%`;
+            
+            // Adjust label text
+            progressLabel.textContent = `${currentCount}/${maxLimit} Tags Pinned`;
+
+            // Display dynamic context messaging layers based on fill thresholds
+            if (currentCount >= maxLimit) {
+                progressWarning.textContent = "CAPPED (20 Max)!";
+                progressWarning.classList.add('is-visible');
+            } else if (currentCount >= 16) {
+                progressWarning.textContent = "Approaching Limit";
+                progressWarning.classList.add('is-visible');
+            } else {
+                progressWarning.textContent = "";
+                progressWarning.classList.remove('is-visible');
+            }
         }
     }
 
