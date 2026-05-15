@@ -71,6 +71,10 @@ li {
     border-radius: 8px;
     color:#f0f0f0;
 }
+
+#unpin:hover {
+    color: #818181;
+}
 #copyAll, #clearAll {
     margin-bottom: 10px;
     cursor: pointer; 
@@ -427,8 +431,15 @@ li {
                     textColorStyle = 'color: #FDBA12;';
                 }
 
-                return `<span style="${textColorStyle}">${tag}</span>` 
-            }
+                const safeGlobalIndex = allTagsMaster.indexOf(tag);
+
+                return `
+                    <span style="${textColorStyle}">
+                        ${tag}
+                        <span id="unpin" style="cursor: pointer; border-radius: 0; border: 0;" onclick="togglePinByIndex(${safeGlobalIndex})">&times;</span>
+                    </span>
+                    `
+                }
             ).join(' ');
         } else {
             pinnedSection.style.display = 'none';
