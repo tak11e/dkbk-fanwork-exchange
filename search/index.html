@@ -516,9 +516,12 @@ li {
 
         // Process search input string matching
         if (str) {
-            displayList = displayList.filter(item =>
-                item.text.toLowerCase().includes(str.toLowerCase())
-            );
+            const cleanSearchInput = str.toLowerCase().replace(/[^a-z0-9]/g, '');
+            
+            displayList = displayList.filter(item => {
+                const cleanTagText = item.text.toLowerCase().replace(/[^a-z0-9]/g, '');
+                return cleanTagText.includes(cleanSearchInput);
+            });
         }
 
         // Sort everything alphabetically without losing our index mappings
