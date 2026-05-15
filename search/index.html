@@ -126,6 +126,11 @@ li {
     font-size: larger;
 }
 
+.filters label[data-count]::after {
+    content: " " attr(data-count);
+    text-transform: none !important;
+}
+
 /* Style the sidenav links and the dropdown button */
 .sidenav span, .dropdown-btn {
     font-family: 'Libre Franklin';
@@ -144,7 +149,7 @@ li {
 }
 
 /* On mouse-over */
-.sidenav span:hover, .dropdown-btn:hover {
+.filters label:hover, .dropdown-btn:hover {
   color: #f1f1f1;
   background-color: #262626;
 }
@@ -194,10 +199,6 @@ li {
     }
 }
 
-.tag-counter {
-    font-size: small;
-}
-
 
 </style>
 <head>
@@ -241,12 +242,12 @@ li {
         </button>
         <div class="dropdown-container">
             <div class="filters">
-                <label><input type="checkbox" onchange="toggleFilter('nsfw', 'include')">NSFW <span id="inc-count-nsfw" class="tag-counter"></span></label>
-                <label><input type="checkbox" onchange="toggleFilter('sfw', 'include')">SFW <span id="inc-count-sfw" class="tag-counter"></span></label>
-                <label><input type="checkbox" onchange="toggleFilter('dddne', 'include')">DDDNE <span id="inc-count-dddne" class="tag-counter"></span></label>
-                <label><input type="checkbox" onchange="toggleFilter('angst', 'include')">Angst <span id="inc-count-angst" class="tag-counter"></span></label>
-                <label><input type="checkbox" onchange="toggleFilter('silly', 'include')">Silly <span id="inc-count-silly" class="tag-counter"></span></label>
-                <label><input type="checkbox" onchange="toggleFilter('au', 'include')">AUs <span id="inc-count-au" class="tag-counter"></span></label>
+                <label data-name="nsfw"><input type="checkbox" onchange="toggleFilter('nsfw', 'include')">NSFW</label>
+                <label data-name="sfw"><input type="checkbox" onchange="toggleFilter('sfw', 'include')">SFW</label>
+                <label data-name="dddne"><input type="checkbox" onchange="toggleFilter('dddne', 'include')">DDDNE</label>
+                <label data-name="angst"><input type="checkbox" onchange="toggleFilter('angst', 'include')">Angst</label>
+                <label data-name="silly"><input type="checkbox" onchange="toggleFilter('silly', 'include')">Silly</label>
+                <label data-name="au"><input type="checkbox" onchange="toggleFilter('au', 'include')">AUs</label>
             </div>
         </div>
         <button class="dropdown-btn">Exclude
@@ -254,12 +255,12 @@ li {
         </button>
         <div class="dropdown-container">
             <div class="filters">
-                <label><input type="checkbox" onchange="toggleFilter('nsfw', 'exclude')">NSFW <span id="exc-count-nsfw" class="tag-counter"></span></label>
-                <label><input type="checkbox" onchange="toggleFilter('sfw', 'exclude')">SFW <span id="exc-count-sfw" class="tag-counter"></span></label>
-                <label><input type="checkbox" onchange="toggleFilter('dddne', 'exclude')">DDDNE <span id="exc-count-dddne" class="tag-counter"></span></label>
-                <label><input type="checkbox" onchange="toggleFilter('angst', 'exclude')">Angst <span id="exc-count-angst" class="tag-counter"></span></label>
-                <label><input type="checkbox" onchange="toggleFilter('silly', 'exclude')">Silly <span id="exc-count-silly" class="tag-counter"></span></label>
-                <label><input type="checkbox" onchange="toggleFilter('au', 'exclude')">AUs <span id="exc-count-au" class="tag-counter"></span></label>
+                <label data-name="nsfw"><input type="checkbox" onchange="toggleFilter('nsfw', 'exclude')">NSFW</label>
+                <label data-name="sfw"><input type="checkbox" onchange="toggleFilter('sfw', 'exclude')">SFW</label>
+                <label data-name="dddne"><input type="checkbox" onchange="toggleFilter('dddne', 'exclude')">DDDNE</label>
+                <label data-name="angst"><input type="checkbox" onchange="toggleFilter('angst', 'exclude')">Angst</label>
+                <label data-name="silly"><input type="checkbox" onchange="toggleFilter('silly', 'exclude')">Silly</label>
+                <label data-name="au"><input type="checkbox" onchange="toggleFilter('au', 'exclude')">AUs</label>
             </div>
         </div>
     </div>
@@ -294,16 +295,14 @@ li {
         groupsToCount.forEach(groupName => {
             if (tagData[groupName]) {
                 const totalTags = tagData[groupName].length;
-
-                const incElement = document.getElementById(`inc-count-${groupName}`);
-                if (incElement) {
-                    incElement.textContent = `(${totalTags})`;
-                }
-
-                const excElement = document.getElementById(`exc-count-${groupName}`);
-                if (excElement) {
-                    excElement.textContent = `(${totalTags})`;
-                }
+                
+                // Target existing labels using the data-name attribute
+                const targetLabels = document.querySelectorAll(`label[data-name="${groupName}"]`);
+                
+                targetLabels.forEach(label => {
+                    // Instantly passes the number value directly into CSS memory
+                    label.setAttribute('data-count', `(${totalTags})`);
+                });
             }
         });
     }
