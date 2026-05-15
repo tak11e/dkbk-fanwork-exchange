@@ -499,18 +499,20 @@ li {
 
         // Live URL updating to share pinned tags in URL
         if (allTagsMaster && allTagsMaster.length > 0) {
-            if (pinnedTags.size > 0) {
-                const indexList = array.from(pinnedTags)
-                    .map(tag => allTagsMaster.indexOf(tag))
-                    .filter(idx => idx != -1);
+            setTimeout(() => {
+                if (pinnedTags.size > 0) {
+                    const indexList = Array.from(pinnedTags)
+                        .map(tag => allTagsMaster.indexOf(tag))
+                        .filter(idx => idx != -1);
 
-                const newQueryString = `?pins=${indexList.join(',')}`;
+                    const newQueryString = `?pins=${indexList.join(',')}`;
 
-                window.history.replaceState({}, document.title, window.location.pathname + newQueryString);
-            } else {
-                // If no tags, clear params
-                window.history.replaceState({}, document.title, window.location.pathname);
-            }
+                    window.history.replaceState({}, document.title, window.location.pathname + newQueryString);
+                } else {
+                    // If no tags, clear params
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+            }, 0);
         }
     }
 
