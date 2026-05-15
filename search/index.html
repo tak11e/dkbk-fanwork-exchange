@@ -552,6 +552,9 @@ li {
             ).join(' ');
         } else {
             pinnedList.innerHTML = '';
+            if (pinnedSectionElement) {
+                pinnedSectionElement.classList.remove('section-expanded')
+            }
         }
 
         // Progress Bar
