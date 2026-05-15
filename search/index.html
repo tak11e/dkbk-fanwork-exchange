@@ -215,7 +215,7 @@ li {
 
 </head>
 <title>
-    Dkbk Fanwork Exchange
+    Search and Save
 </title>
 <body>
     <!-- The Search Bar & Pinned Buttons -->
@@ -239,12 +239,12 @@ li {
         </button>
         <div class="dropdown-container">
             <div class="filters">
-                <label><input type="checkbox" onchange="toggleFilter('nsfw', 'include')">NSFW</label>
-                <label><input type="checkbox" onchange="toggleFilter('sfw', 'include')">SFW</label>
-                <label><input type="checkbox" onchange="toggleFilter('dddne', 'include')">DDDNE</label>
-                <label><input type="checkbox" onchange="toggleFilter('angst', 'include')">Angst</label>
-                <label><input type="checkbox" onchange="toggleFilter('silly', 'include')">Silly</label>
-                <label><input type="checkbox" onchange="toggleFilter('au', 'include')">AUs</label>
+                <label><input type="checkbox" onchange="toggleFilter('nsfw', 'include')">NSFW <span id="inc-count-nsfw" class="tag-counter"></span></label>
+                <label><input type="checkbox" onchange="toggleFilter('sfw', 'include')">SFW <span id="inc-count-sfw" class="tag-counter"></span></label>
+                <label><input type="checkbox" onchange="toggleFilter('dddne', 'include')">DDDNE <span id="inc-count-dddne" class="tag-counter"></span></label>
+                <label><input type="checkbox" onchange="toggleFilter('angst', 'include')">Angst <span id="inc-count-angst" class="tag-counter"></span></label>
+                <label><input type="checkbox" onchange="toggleFilter('silly', 'include')">Silly <span id="inc-count-silly" class="tag-counter"></span></label>
+                <label><input type="checkbox" onchange="toggleFilter('au', 'include')">AUs <span id="inc-count-au" class="tag-counter"></span></label>
             </div>
         </div>
         <button class="dropdown-btn">Exclude
@@ -252,15 +252,16 @@ li {
         </button>
         <div class="dropdown-container">
             <div class="filters">
-                <label><input type="checkbox" onchange="toggleFilter('nsfw', 'exclude')">NSFW</label>
-                <label><input type="checkbox" onchange="toggleFilter('sfw', 'exclude')">SFW</label>
-                <label><input type="checkbox" onchange="toggleFilter('dddne', 'exclude')">DDDNE</label>
-                <label><input type="checkbox" onchange="toggleFilter('angst', 'exclude')">Angst</label>
-                <label><input type="checkbox" onchange="toggleFilter('silly', 'exclude')">Silly</label>
-                <label><input type="checkbox" onchange="toggleFilter('au', 'exclude')">AUs</label>
+                <label><input type="checkbox" onchange="toggleFilter('nsfw', 'exclude')">NSFW <span id="exc-count-nsfw" class="tag-counter"></span></label>
+                <label><input type="checkbox" onchange="toggleFilter('sfw', 'exclude')">SFW <span id="exc-count-sfw" class="tag-counter"></span></label>
+                <label><input type="checkbox" onchange="toggleFilter('dddne', 'exclude')">DDDNE <span id="exc-count-dddne" class="tag-counter"></span></label>
+                <label><input type="checkbox" onchange="toggleFilter('angst', 'exclude')">Angst <span id="exc-count-angst" class="tag-counter"></span></label>
+                <label><input type="checkbox" onchange="toggleFilter('silly', 'exclude')">Silly <span id="exc-count-silly" class="tag-counter"></span></label>
+                <label><input type="checkbox" onchange="toggleFilter('au', 'exclude')">AUs <span id="exc-count-au" class="tag-counter"></span></label>
             </div>
         </div>
     </div>
+
 
 <!-- The List -->
     <ol id="list_for_freeform_0" class="tags index group"></ol>
@@ -285,6 +286,26 @@ li {
     const modModal = document.getElementById('modModal')
     const modPassField = document.getElementById('modPassField')
 
+    function updateCategoryCounters() {
+        const groupsToCount = ['nsfw', 'sfw', 'dddne', 'angst', 'silly', 'au'];
+
+        groupsToCount.forEach(groupName => {
+            if (tagData[groupName]) {
+                const totalTags = tagData[groupName].length;
+
+                const incElement = document.getElementById(`inc-count-${groupName}`);
+                if (incElement) {
+                    incElement.textContent = `(${totalTags})`;
+                }
+
+                const excElement = document.getElementById(`exc-count-${groupName}`);
+                if (excElement) {
+                    excElement.textContent = `(${totalTags})`;
+                }
+            }
+        });
+    }
+
     function loadFromStorage() {
         const saved = localStorage.getItem('myPinnedTags');
         if (saved) {
@@ -293,27 +314,6 @@ li {
         }
     }
     //add tag to pinned
-
-    // function togglePinByText(tag) {
-    //     if (pinnedTags.has(tag)) {
-    //         pinnedTags.delete(tag)
-    //     } else {
-    //         if (pinnedTags.size >= 20) { 
-    //             alert("Too many tags! The DKBK Fanwork Exchange Collection has a limit of up to 20 tags.")
-    //             renderTags(searchInput.value)
-    //             return
-    //         }
-    //         pinnedTags.add(tag);
-    //     }
-
-    //     localStorage.setItem('myPinnedTags', JSON.stringify(Array.from(pinnedTags)));
-
-    //     updatePinnedUI();
-    //     renderTags(searchInput.value);
-    // }
-
-
-
     function togglePinByIndex(globalMasterIndex) {
         const tag = allTagsMaster[globalMasterIndex];
 
