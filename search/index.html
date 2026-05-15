@@ -178,27 +178,6 @@ li {
   font-size: 110%;
 }
 
-@media screen and (max-width: 600px) {
-    .sidenav {
-        width: 100%;
-        height: auto;
-        position: sticky;
-        position: -webkit-sticky;
-        top: 5%;
-    }
-    #list_for_freeform_0 {
-        margin-right: 0;
-        padding: 0;
-    }
-    #pinnedSection {
-        margin-right: 0;
-        padding: 0;
-    }
-    #pinnedList {
-        margin-right: 0;
-    }
-}
-
 /* FIXED: Locks both the search bar and the progress track to the top of the viewport */
 .sticky-search-header {
     position: -webkit-sticky; /* Safari support */
@@ -258,6 +237,34 @@ li {
     opacity: 1;
 }
 
+@media screen and (max-width: 600px) {
+    .sticky-search-header {
+        position: -webkit-sticky;
+        position: sticky;
+        top: 0;
+        z-index: 101; /* Layers it right above the dropdown buttons */
+        background-color: #111;
+    }
+    .sidenav {
+        width: 100%;
+        height: auto;
+        position: sticky;
+        position: -webkit-sticky;
+        top: 75px;
+        z-index: 100;
+    }
+    #list_for_freeform_0 {
+        margin-right: 0;
+        padding: 0;
+    }
+    #pinnedSection {
+        margin-right: 0;
+        padding: 0;
+    }
+    #pinnedList {
+        margin-right: 0;
+    }
+}
 
 
 </style>
