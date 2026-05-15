@@ -46,18 +46,35 @@ li {
 }
 #pinnedSection {
     background: #181818;
-    display: none; 
-    padding: 10px; 
+    /* display: none;  */
+    /* padding: 10px;  */
     border: 1px solid #000; 
     border-radius: 8px;
-    margin: 10px 0px;
+    /* margin: 10px 0px; */
     margin-right: 210px;
     font-size: larger;
+    overflow: hidden; 
 
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0;
+    max-height: 0px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    border-color: transparent;
+
+    transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1), 
+                max-height 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+                margin 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+                padding 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+#pinnedSection.section-expanded {
     opacity: 1;
     max-height: 500px;
-    overflow: hidden; 
+    padding: 10px; 
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border-color: #000;
 }
 .section-shrinking {
     opacity: 0 !important;
@@ -99,7 +116,9 @@ li {
     color:#f0f0f0;
 
     /* Transition to remove */
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1), 
+                transform 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+                max-width 0.35s ease;
     opacity: 1;
     transform: scale(1);
     max-width: 100%;
@@ -460,45 +479,9 @@ li {
     //add tag to pinned
     function togglePinByIndex(globalMasterIndex) {
         const tag = allTagsMaster[globalMasterIndex];
-
+        
         if (!tag) return;
 
-        if (pinnedTags.has(tag)) {
-            const pinnedSectionElement = document.getElementById('pinnedSection');
-
-            const allPills = document.querySelectorAll('#pinnedList > span:not(#unpin)');
-            let targetPill = null;
-
-            allPills.forEach(pill => {
-                const pillText = pill.textContent.replace('×', '').trim();
-                if (pillText === tag.trim()) {
-                    targetPill = pill;
-                }
-            });
-
-            if (targetPill) {
-                targetPill.classList.add('pill-shrinking');
-
-                if (pinnedTags.size === 1 && pinnedSectionElement) {
-                    pinnedSectionElement.classList.add('section-shrinking');
-                }
-                
-                setTimeout(() => {
-                    executePinToggleLogic(tag);
-                    
-                    if (pinnedSectionElement) {
-                        pinnedSectionElement.classList.remove('section-shrinking');
-                    }
-                }, 300);
-                return;
-            }
-        }
-
-        executePinToggleLogic(tag);
-    }
-
-    //Helper function that handles data after the animation stops
-    function executePinToggleLogic(tag) {
         if (pinnedTags.has(tag)) {
             pinnedTags.delete(tag);
         } else {
@@ -516,9 +499,40 @@ li {
         renderTags(searchInput.value);
     }
 
+    //Helper function that handles data after the animation stops
+    function executePinToggleLogic(tag) {
+        const pinnedSectionElement = document.getElementById('pinnedSection')
+
+        if (pinnedTags.has(tag)) {
+            pinnedTags.delete(tag);
+        } else {
+            if (pinnedTags.size >= 20) { 
+                alert("Too many tags! The DKBK Fanwork Exchange Collection has a limit of up to 20 tags.");
+                renderTags(searchInput.value);
+                return;
+            }
+
+            if (pinnedSectionElement) {
+                pinnedSectionElement.classList.remove('section-shrinking');
+            }
+            pinnedTags.add(tag);
+        }
+
+        localStorage.setItem('myPinnedTags', JSON.stringify(Array.from(pinnedTags)));
+
+        updatePinnedUI();
+        renderTags(searchInput.value);
+    }
+
     function updatePinnedUI() {
+        const pinnedSectionElement = document.getElementById('pinnedSection');
+
         if (pinnedTags.size > 0) {
-            pinnedSection.style.display = 'block';
+            if (pinnedSectionElement) {
+                pinnedSectionElement.classList.add('section-expanded');
+            }
+
+            // pinnedSection.style.display = 'block';
             pinnedList.innerHTML = Array.from(pinnedTags).map(tag => {
                 let textColorStyle = '';
 
@@ -537,7 +551,7 @@ li {
                 }
             ).join(' ');
         } else {
-            pinnedSection.style.display = 'none';
+            pinnedList.innerHTML = '';
         }
 
         // Progress Bar
@@ -586,6 +600,33 @@ li {
                     window.history.replaceState({}, document.title, window.location.pathname);
                 }
             }, 0);
+        }
+    }
+
+    function updateProgressBar(manualAdjustment = 0) {
+        // Calculate the fake temporary count for the visual transition
+        const currentCount = Math.max(0, pinnedTags.size + manualAdjustment);
+        const maxLimit = 20;
+        const percentage = Math.min((currentCount / maxLimit) * 100, 100);
+
+        const progressBar = document.getElementById('pinProgressBar');
+        const progressLabel = document.getElementById('progressBarLabel');
+        const progressWarning = document.getElementById('progressBarWarning');
+
+        if (progressBar && progressLabel && progressWarning) {
+            progressBar.style.width = `${percentage}%`;
+            progressLabel.textContent = `${currentCount}/${maxLimit} Tags Pinned`;
+
+            if (currentCount >= maxLimit) {
+                progressWarning.textContent = "CAPPED (20 Max)!";
+                progressWarning.classList.add('is-visible');
+            } else if (currentCount >= 16) {
+                progressWarning.textContent = "Approaching Limit";
+                progressWarning.classList.add('is-visible');
+            } else {
+                progressWarning.textContent = "";
+                progressWarning.classList.remove('is-visible');
+            }
         }
     }
 
@@ -669,19 +710,24 @@ li {
         const pinnedSectionElement = document.getElementById('pinnedSection');
 
         if (targetPill) {
+            updateProgressBar(-1);
+
             targetPill.classList.add('pill-shrinking');
 
             if (pinnedTags.size == 1 && pinnedSectionElement) {
-                pinnedSectionElement.classList.add('section-shrinking');
+                pinnedSectionElement.classList.remove('section-expanded');
             }
 
-            setTimeout(() => {
-                togglePinByIndex(safeGlobalIndex);
-
-                if (pinnedSectionElement) {
-                    pinnedSectionElement.classList.remove('section-shrinking')
+            targetPill.addEventListener('transitionend', function handler(e) {
+                // Only fire when the main transform/opacity property finishes
+                if (e.propertyName == 'opacity' || e.propertyName == 'transform') {
+                    // Remove this temporary listener immediately so it doesn't leak memory
+                    targetPill.removeEventListener('transitionend', handler);
+                    
+                    // Execute data states now that visual transitions are 100% complete
+                    togglePinByIndex(safeGlobalIndex);
                 }
-            }, 300);
+            });
         } else {
             togglePinByIndex(safeGlobalIndex);
         }
