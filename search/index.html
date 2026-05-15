@@ -425,51 +425,6 @@ li {
         listElement.innerHTML = html;
     }
 
-    // let filtered;
-
-        // if (activeIncludes.size == 0) {
-        //     filtered = [...new Set([...tagData.all, ...(tagData.round_specific || [])])];
-        //     filtered.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
-        // } else {
-        //     let combined = [];
-        //     activeIncludes.forEach(group => {
-        //         combined = combined.concat(tagData[group] || []);
-        //     });
-
-        //     filtered = [...new Set(combined)];
-        //     filtered.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
-        // }
-
-        // activeExcludes.forEach(group => {
-        //     const excludeList = tagData[group] || [];
-        //     filtered = filtered.filter(tag => !excludeList.includes(tag));
-        // });
-
-        // filtered = filtered.filter(tag =>
-        //     tag.toLowerCase().includes(str.toLowerCase())
-        // );
-
-        // let html = "";
-
-        // filtered.forEach((tag) => {
-        //     const isChecked = pinnedTags.has(tag) ? 'checked' : '';
-
-        //     let textColorStyle = '';
-
-        //     if (tagData.round_specific && tagData.round_specific.includes(tag)) {
-        //         textColorStyle = 'color: #FDBA12;';
-        //     }
-
-        //         html += `
-        //             <li>
-        //                 <label>
-        //                     <input type="checkbox" ${isChecked} onchange="togglePinByText(\`${tag.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)">
-        //                     <span style="vertical-align: middle; ${textColorStyle}">${tag}</span>
-        //                 </label>
-        //             </li>`;
-        // });
-        // listElement.innerHTML = html;
-
     //filter
     window.toggleFilter = (groupName, type) => {
         const targetSet = (type == 'include') ? activeIncludes : activeExcludes;
@@ -517,6 +472,8 @@ li {
                 // Create a permanent, flat master array of every tag text available
                 allTagsMaster = [...new Set([...(data.all || []), ...(data.round_specific || [])])];
 
+                updateCategoryCounters(); 
+                
                 loadFromStorage();
                 renderTags();
 
